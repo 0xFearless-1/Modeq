@@ -60,7 +60,7 @@ export default function LandingPage() {
               transition={{ duration: 0.5 }}
             >
               <Waveform size={0.8} />
-              <span className="kicker">Live on GenLayer - Studio, Asimov, Bradbury</span>
+              <span className="kicker">Live on GenLayer</span>
             </motion.div>
 
             <motion.h1
