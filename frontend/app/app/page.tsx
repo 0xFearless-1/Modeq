@@ -111,23 +111,29 @@ export default function AppPage() {
       </div>
 
       <div className="criteria-panel">
-        <span className="criteria-title">Checked against 5 categories:</span>
+        <span className="criteria-title">Checked against 5 categories</span>
         <div className="criteria-grid">
           {CRITERIA.map((c) => (
             <div key={c.label} className="criteria-item">
-              <c.icon size={15} strokeWidth={1.8} />
-              <div>
-                <div className="criteria-label">{c.label}</div>
-                <div className="criteria-desc">{c.desc}</div>
-              </div>
+              <span className="criteria-icon">
+                <c.icon size={17} strokeWidth={1.8} />
+              </span>
+              <div className="criteria-label">{c.label}</div>
+              <div className="criteria-desc">{c.desc}</div>
             </div>
           ))}
         </div>
-        <p className="criteria-note">
-          A post that matches none of these is classified <code>none</code> and
-          allowed. Each category gets a confidence score - above 70% blocks the post,
-          above 40% flags it for review, otherwise it's allowed.
-        </p>
+        <div className="criteria-scale">
+          <span className="criteria-scale-item">
+            <i className="dot-legend allow" /> no match → <strong>ALLOW</strong>
+          </span>
+          <span className="criteria-scale-item">
+            <i className="dot-legend flag" /> 40-70% confidence → <strong>FLAG</strong>
+          </span>
+          <span className="criteria-scale-item">
+            <i className="dot-legend block" /> &gt;70% confidence → <strong>BLOCK</strong>
+          </span>
+        </div>
       </div>
 
       <div className="app-layout">
