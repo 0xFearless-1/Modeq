@@ -52,12 +52,15 @@ Runtime pin: `# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jq
 ```bash
 python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 genvm-lint check contracts/moderation_registry.py
-pytest tests/direct/ -v
+pytest tests/direct/ -v                      # fast, in-memory, mocked LLM
+gltest --network studionet tests/integration/ -v -s   # real consensus on hosted Studio
 ```
 
-8 Direct-mode tests (in-memory, mocked LLM) cover the ALLOW/FLAG/BLOCK thresholds, the
-`primary_category == "none"` override, rejection of malformed/out-of-allow-list model
-output, and that a model cannot smuggle its own `"decision"` field past validation.
+8 Direct-mode tests cover the ALLOW/FLAG/BLOCK thresholds, the `primary_category ==
+"none"` override, rejection of malformed/out-of-allow-list model output, and that a model
+cannot smuggle its own `"decision"` field past validation. The integration test deploys
+to real GenLayer Studio, submits real content, waits for actual multi-validator
+consensus, and reads the resulting case back on-chain.
 
 ## Deployed instances
 
