@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { EyeOff, Eye, AlertTriangle } from "lucide-react";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -145,6 +146,8 @@ export default function AuditLogPage() {
           </div>
         </>
       )}
+
+      <SiteFooter />
     </>
   );
 }

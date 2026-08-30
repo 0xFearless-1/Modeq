@@ -20,6 +20,7 @@ import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 import { Stepper } from "@/components/Stepper";
 import { RecentFeed } from "@/components/RecentFeed";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -264,6 +265,8 @@ export default function AppPage() {
 
         <RecentFeed />
       </div>
+
+      <SiteFooter />
     </>
   );
 }

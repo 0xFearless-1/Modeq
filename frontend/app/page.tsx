@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
@@ -23,6 +22,7 @@ import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
 import { Waveform } from "@/components/Waveform";
 import { HeroWave } from "@/components/HeroWave";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -364,41 +364,7 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      <footer className="site-footer">
-        <div>
-          <div className="brand">
-            <Image src="/logo.svg" alt="" width={47} height={32} className="brand-mark" />
-            Modeq
-          </div>
-          <p className="site-footer-blurb">
-            A transparent, consensus-verified content moderation registry built on
-            GenLayer Intelligent Contracts.
-          </p>
-        </div>
-
-        <div>
-          <h4>Product</h4>
-          <ul>
-            <li>
-              <Link href="/app">Launch app</Link>
-            </li>
-            <li>
-              <Link href="/audit">Audit log</Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Networks</h4>
-          <ul>
-            <li>GenLayer Studio</li>
-            <li>Asimov testnet</li>
-            <li>Bradbury testnet</li>
-          </ul>
-        </div>
-
-        <div className="site-footer-bottom">Built on GenLayer Intelligent Contracts</div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }
