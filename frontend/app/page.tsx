@@ -196,7 +196,7 @@ export default function LandingPage() {
       <section className="chatgpt-section">
         <Reveal>
           <div className="section-head">
-            <h2>Why not just ask ChatGPT?</h2>
+            <h2>Why not just ask an AI chatbot?</h2>
             <p>
               Any LLM can classify text - that was never the hard part. The hard part is
               trusting the answer when nobody else can check it.
@@ -211,8 +211,9 @@ export default function LandingPage() {
               </div>
               <h3>One company, one opinion</h3>
               <p>
-                Ask ChatGPT and you get a single private company&apos;s private answer.
-                Nobody else can verify it, reproduce it, or check it after the fact.
+                Ask an AI chatbot and you get a single private company&apos;s private
+                answer. Nobody else can verify it, reproduce it, or check it after the
+                fact.
               </p>
             </div>
           </RevealItem>
@@ -236,8 +237,8 @@ export default function LandingPage() {
               </div>
               <h3>No public record</h3>
               <p>
-                Ask ChatGPT and the answer disappears with the chat. Every Modeq verdict
-                is permanent, public, and auditable by anyone - forever.
+                Ask an AI chatbot and the answer disappears with the chat. Every Modeq
+                verdict is permanent, public, and auditable by anyone - forever.
               </p>
             </div>
           </RevealItem>
