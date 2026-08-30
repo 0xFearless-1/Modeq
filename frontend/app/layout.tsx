@@ -46,10 +46,10 @@ export default function RootLayout({
             <Link className="brand" href="/">
               <Image
                 className="brand-mark"
-                src="/logo-mark.png"
+                src="/logo.svg"
                 alt=""
-                width={22}
-                height={22}
+                width={47}
+                height={32}
                 priority
               />
               Modeq

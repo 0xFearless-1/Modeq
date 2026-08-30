@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Check, X, Activity, Users, Globe, ShieldOff } from "lucide-react";
@@ -283,7 +284,7 @@ export default function LandingPage() {
       <footer className="site-footer">
         <div>
           <div className="brand">
-            <Waveform size={0.9} />
+            <Image src="/logo.svg" alt="" width={47} height={32} className="brand-mark" />
             Modeq
           </div>
           <p className="site-footer-blurb">
