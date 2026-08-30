@@ -72,9 +72,9 @@ its fix) are in [deploy/NOTES.md](deploy/NOTES.md).
 
 ## Frontend - `frontend/`
 
-A Next.js app with two pages: a wallet-connected submit form, and a public audit-log page
-that lists every case with no wallet required (the actual transparency pitch). See
-[frontend/README.md](frontend/README.md).
+A Next.js app: a marketing landing page (`/`), the wallet-connected moderation tool
+(`/app`), and a public audit-log page (`/audit`) that lists every case with no wallet
+required (the actual transparency pitch). See [frontend/README.md](frontend/README.md).
 
 ## Roadmap
 
