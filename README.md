@@ -1,0 +1,96 @@
+# Modeq
+
+A transparent, consensus-verified content moderation registry built on **GenLayer
+Intelligent Contracts**.
+
+> **Status:** MVP live on studionet and both GenLayer testnets (Asimov, Bradbury). Text
+> moderation only for now - see [Roadmap](#roadmap).
+
+## Why this exists
+
+Content moderation today is almost always a single company's black box: one backend, one
+model, one unaccountable decision, no visible trail. Modeq moves the decision itself onto
+GenLayer:
+
+- Every submission is classified by an LLM running independently on **multiple
+  validators**, and the result only lands on-chain if it survives GenLayer's
+  equivalence-principle consensus (`gl.eq_principle.strict_eq`) - no single node's
+  opinion is enough.
+- The model is **not trusted with the final call**. It only returns a structured
+  classification (categories + confidence); a small piece of deterministic Python code
+  in the contract turns that into ALLOW / FLAG / BLOCK. A model can misclassify content,
+  but it cannot talk its way past the threshold logic with a clever free-text answer.
+- Every case and verdict is stored on-chain and publicly listable
+  (`list_cases`/`get_case`) - a small forum, DAO, or community can point to an
+  append-only, third-party-auditable moderation log instead of "trust us."
+
+## Contract - `contracts/moderation_registry.py`
+
+```
+submit_content(text) -> case_id      # classify + store a new case
+get_case(case_id) -> dict            # one case: text, categories, confidence, decision
+list_cases(offset, limit) -> list    # paginated audit log
+total_cases() -> int
+```
+
+`submit_content` asks the model for strict JSON
+(`{"categories": [...], "primary_category": ..., "max_confidence": "0.xx"}`) against a
+fixed category allow-list, validates the shape and values in Python (raises on anything
+malformed or out of range), then computes the decision deterministically:
+
+- `primary_category == "none"` -> **ALLOW**
+- confidence > 70% -> **BLOCK**
+- confidence > 40% -> **FLAG**
+- otherwise -> **ALLOW**
+
+Runtime pin: `# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }`.
+
+## Testing
+
+```bash
+python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+genvm-lint check contracts/moderation_registry.py
+pytest tests/direct/ -v
+```
+
+8 Direct-mode tests (in-memory, mocked LLM) cover the ALLOW/FLAG/BLOCK thresholds, the
+`primary_category == "none"` override, rejection of malformed/out-of-allow-list model
+output, and that a model cannot smuggle its own `"decision"` field past validation.
+
+## Deployed instances
+
+Full reproduction steps and live on-chain evidence (including a real bug this caught, and
+its fix) are in [deploy/NOTES.md](deploy/NOTES.md).
+
+| Network | Contract | Status |
+|---|---|---|
+| studionet | `0x5F1957D3AE0e26dCE709fe9095FE39D37f2eC58a` | 2 live classified cases |
+| Asimov testnet | [`0xA4f786898971380B28c0AaFA9B6bD1f7982844C8`](https://explorer-asimov.genlayer.com/address/0xA4f786898971380B28c0AaFA9B6bD1f7982844C8) | schema-verified, 1 live case |
+| Bradbury testnet | [`0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5`](https://explorer-bradbury.genlayer.com/address/0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5) | schema-verified, 1 live case |
+
+## Frontend - `frontend/`
+
+A Next.js app with two pages: a wallet-connected submit form, and a public audit-log page
+that lists every case with no wallet required (the actual transparency pitch). See
+[frontend/README.md](frontend/README.md).
+
+## Roadmap
+
+- **Multimodal moderation** (planned next Milestone): accept an image alongside/instead
+  of text, using `gl.nondet.exec_prompt(images=[...])`, and extend the category schema
+  accordingly.
+- Per-community configurable thresholds and category sets.
+- An appeal flow that re-runs classification with the submitter's counter-argument
+  attached, under a second independent consensus round.
+
+## Built on
+
+The official GenLayer toolchain: [`genlayer-py`](https://github.com/genlayerlabs/genlayer-py),
+[`genlayer-testing-suite`](https://github.com/genlayerlabs/genlayer-testing-suite) (gltest),
+[`genvm-linter`](https://github.com/genlayerlabs/genvm-linter),
+[`genlayer-js`](https://github.com/genlayerlabs/genlayer-js), and patterns from the
+[`genlayer-project-boilerplate`](https://github.com/genlayerlabs/genlayer-project-boilerplate).
+
+## License
+
+MIT - see [LICENSE](LICENSE).

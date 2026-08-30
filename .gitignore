@@ -1,0 +1,11 @@
+.venv/
+artifacts/
+.env
+__pycache__/
+*.pyc
+
+# frontend
+frontend/node_modules/
+frontend/.next/
+frontend/.env
+frontend/.env.local

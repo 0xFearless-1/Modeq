@@ -1,0 +1,12 @@
+networks:
+  default: localnet
+  localnet:
+    url: http://127.0.0.1:4000/api
+    leader_only: false
+  studionet: {}
+  # Testnet deploys go through the `genlayer` CLI (see deploy/NOTES.md), not gltest:
+  # the pinned genlayer-py client cannot decode the current testnet consensus contract.
+paths:
+  contracts: contracts
+  artifacts: artifacts
+environment: .env
