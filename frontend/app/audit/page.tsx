@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
 
+export const dynamic = "force-dynamic";
+
 export default function AuditLogPage() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,54 +40,53 @@ export default function AuditLogPage() {
         </p>
       </div>
 
-      <motion.div
-        className="panel"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {loading && <p className="muted">Loading...</p>}
-        {error && <p className="error">{error}</p>}
+      {loading && (
+        <div className="panel">
+          <p className="muted">Loading...</p>
+        </div>
+      )}
+      {error && (
+        <div className="panel">
+          <p className="error" style={{ marginTop: 0 }}>
+            {error}
+          </p>
+        </div>
+      )}
 
-        {!loading && !error && cases.length === 0 && (
+      {!loading && !error && cases.length === 0 && (
+        <div className="panel">
           <p className="muted">No cases submitted yet.</p>
-        )}
+        </div>
+      )}
 
-        {cases.length > 0 && (
-          <>
+      {cases.length > 0 && (
+        <>
+          <div className="panel">
             <DecisionBar allow={allow} flag={flag} block={block} />
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Text</th>
-                  <th>Category</th>
-                  <th>Confidence</th>
-                  <th>Decision</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cases.map((c, i) => (
-                  <motion.tr
-                    key={c.case_id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.6) }}
-                  >
-                    <td>{c.case_id}</td>
-                    <td>{c.text}</td>
-                    <td>{c.primary_category}</td>
-                    <td>{(c.confidence_bps / 100).toFixed(0)}%</td>
-                    <td>
-                      <span className={`badge ${c.decision}`}>{c.decision}</span>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </motion.div>
+          </div>
+
+          <div className="case-feed">
+            {cases.map((c, i) => (
+              <motion.div
+                key={c.case_id}
+                className={`case-card ${c.decision}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.6) }}
+              >
+                <div className="case-card-top">
+                  <span className={`badge ${c.decision}`}>{c.decision}</span>
+                  <span className="case-meta">
+                    case #{c.case_id} - {c.primary_category} -{" "}
+                    {(c.confidence_bps / 100).toFixed(0)}% confidence
+                  </span>
+                </div>
+                <p className="case-text">{c.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }

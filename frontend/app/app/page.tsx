@@ -6,6 +6,8 @@ import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 
+export const dynamic = "force-dynamic";
+
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
   const [text, setText] = useState("");

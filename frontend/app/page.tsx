@@ -7,6 +7,10 @@ import { listCases, totalCases, type Case } from "@/lib/contract";
 import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
 import { CountUp } from "@/components/CountUp";
 import { DecisionBar } from "@/components/DecisionBar";
+import { ConsensusOrb } from "@/components/ConsensusOrb";
+import { LiveTicker } from "@/components/LiveTicker";
+
+export const dynamic = "force-dynamic";
 
 export default function LandingPage() {
   const [count, setCount] = useState<number | null>(null);
@@ -35,55 +39,73 @@ export default function LandingPage() {
           <span />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="eyebrow"
-        >
-          <span className="dot dot-live" />
-          Live on GenLayer Studio, Asimov &amp; Bradbury
-        </motion.div>
+        <div className="hero-grid">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55 }}
+              className="eyebrow"
+            >
+              <span className="dot dot-live" />
+              Live on GenLayer Studio, Asimov &amp; Bradbury
+            </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.08 }}
-        >
-          Content moderation
-          <br />
-          you don&apos;t have to <span>trust</span>.
-        </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.08 }}
+            >
+              Nobody moderates
+              <br />
+              alone. <span>Five validators do.</span>
+            </motion.h1>
 
-        <motion.p
-          className="lead"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.16 }}
-        >
-          Every submission is classified by an LLM running independently on multiple
-          GenLayer validators. The model never makes the final call - a small piece of
-          deterministic code does, and every verdict lands in a public, on-chain audit
-          log.
-        </motion.p>
+            <motion.p
+              className="lead"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.16 }}
+            >
+              Modeq classifies every submission with an LLM running independently on
+              multiple GenLayer validators. The model never makes the final call - fixed,
+              auditable code does - and every verdict is written to a public on-chain log.
+            </motion.p>
 
-        <motion.div
-          className="hero-ctas"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.24 }}
-        >
-          <Link className="btn btn-primary btn-lg btn-shimmer" href="/app">
-            Launch app
-          </Link>
-          <Link className="btn btn-secondary btn-lg" href="/audit">
-            View audit log
-          </Link>
-        </motion.div>
+            <motion.div
+              className="hero-ctas"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.24 }}
+            >
+              <Link className="btn btn-primary btn-lg btn-shimmer" href="/app">
+                Launch app
+              </Link>
+              <Link className="btn btn-secondary btn-lg" href="/audit">
+                View audit log
+              </Link>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="hero-visual"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
+            <ConsensusOrb />
+          </motion.div>
+        </div>
       </section>
 
+      {cases.length > 0 && (
+        <section style={{ padding: "0", border: "none" }}>
+          <LiveTicker cases={cases} />
+        </section>
+      )}
+
       <Reveal>
-        <section style={{ paddingTop: 0 }}>
+        <section>
           <div className="stat-strip">
             <div className="stat">
               <div className="value">
@@ -117,57 +139,71 @@ export default function LandingPage() {
       <section>
         <Reveal>
           <div className="section-head">
-            <h2>Why not just call an API?</h2>
-            <p>
-              Because a single company&apos;s black-box moderation gives you one opinion,
-              no receipts, and nothing to audit when it gets something wrong.
-            </p>
+            <h2>Moderation you can point at</h2>
+            <p>A dashboard can say anything. A public ledger has to show its work.</p>
           </div>
         </Reveal>
-        <RevealGroup className="feature-grid" stagger={0.12}>
-          <RevealItem>
-            <div className="feature-card">
-              <div className="feature-icon">◆</div>
-              <h3>Multi-validator consensus</h3>
-              <p>
-                Each submission is classified independently by every validator. A
-                verdict only lands on-chain once GenLayer&apos;s equivalence principle
-                agrees it held up - no single node&apos;s opinion is enough.
-              </p>
+        <Reveal>
+          <div className="compare">
+            <div className="compare-col bad">
+              <h3>Black-box moderation</h3>
+              <ul>
+                <li>
+                  <span className="compare-mark">✕</span>
+                  One company&apos;s model, one opinion, no second vote
+                </li>
+                <li>
+                  <span className="compare-mark">✕</span>
+                  Verdicts explained after the fact, if at all
+                </li>
+                <li>
+                  <span className="compare-mark">✕</span>
+                  A cleverly worded prompt can talk the model into anything
+                </li>
+                <li>
+                  <span className="compare-mark">✕</span>
+                  No record a third party can independently check
+                </li>
+              </ul>
             </div>
-          </RevealItem>
-          <RevealItem>
-            <div className="feature-card">
-              <div className="feature-icon">▣</div>
-              <h3>Deterministic guardrails</h3>
-              <p>
-                The model returns structured categories and a confidence score -
-                nothing more. Plain, auditable Python code turns that into ALLOW / FLAG
-                / BLOCK, so a clever prompt can&apos;t talk its way past the threshold.
-              </p>
+            <div className="compare-col good">
+              <h3>Modeq</h3>
+              <ul>
+                <li>
+                  <span className="compare-mark">✓</span>5 validators classify
+                  independently before anything is accepted
+                </li>
+                <li>
+                  <span className="compare-mark">✓</span>
+                  Structured categories + confidence, not a free-text verdict
+                </li>
+                <li>
+                  <span className="compare-mark">✓</span>
+                  Fixed Python thresholds decide - the model only classifies
+                </li>
+                <li>
+                  <span className="compare-mark">✓</span>
+                  Every case is public and on-chain, forever
+                </li>
+              </ul>
             </div>
-          </RevealItem>
-          <RevealItem>
-            <div className="feature-card">
-              <div className="feature-icon">▤</div>
-              <h3>Public audit trail</h3>
-              <p>
-                Every case, every category, every verdict is stored on-chain and
-                publicly listable. A community can point to a record instead of asking
-                people to trust it.
-              </p>
-            </div>
-          </RevealItem>
-        </RevealGroup>
+          </div>
+        </Reveal>
       </section>
 
       <section>
         <Reveal>
           <div className="section-head">
-            <h2>How it works</h2>
-            <p>From submission to a recorded, on-chain verdict.</p>
+            <h2>From text to verdict</h2>
           </div>
         </Reveal>
+        <div className="flow-line">
+          <motion.div
+            className="flow-dot"
+            animate={{ left: ["0%", "100%"] }}
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
         <RevealGroup className="steps" stagger={0.12}>
           <RevealItem>
             <div className="step">
