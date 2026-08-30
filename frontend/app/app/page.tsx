@@ -3,7 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import {
+  Wallet,
+  Send,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Megaphone,
+  MessageSquareWarning,
+  UserX,
+  EyeOff,
+  Flame,
+} from "lucide-react";
 import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
@@ -17,6 +28,14 @@ const RESULT_ICON = {
   FLAG: AlertTriangle,
   BLOCK: XCircle,
 };
+
+const CRITERIA = [
+  { icon: Megaphone, label: "Spam", desc: "ads, scams, promotional links" },
+  { icon: MessageSquareWarning, label: "Hate speech", desc: "attacks on identity or group" },
+  { icon: UserX, label: "Harassment", desc: "targeted abuse or threats" },
+  { icon: EyeOff, label: "NSFW", desc: "sexual or explicit content" },
+  { icon: Flame, label: "Violence", desc: "graphic or violent content" },
+];
 
 const RESULT_MEANING = {
   ALLOW: "Your post stays visible in the community feed, right away.",
@@ -88,6 +107,26 @@ export default function AppPage() {
           community would post. It's classified by an LLM running independently on
           multiple GenLayer validators, then a fixed set of deterministic rules decides
           ALLOW, FLAG, or BLOCK - never the model itself.
+        </p>
+      </div>
+
+      <div className="criteria-panel">
+        <span className="criteria-title">Checked against 5 categories:</span>
+        <div className="criteria-grid">
+          {CRITERIA.map((c) => (
+            <div key={c.label} className="criteria-item">
+              <c.icon size={15} strokeWidth={1.8} />
+              <div>
+                <div className="criteria-label">{c.label}</div>
+                <div className="criteria-desc">{c.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="criteria-note">
+          A post that matches none of these is classified <code>none</code> and
+          allowed. Each category gets a confidence score - above 70% blocks the post,
+          above 40% flags it for review, otherwise it's allowed.
         </p>
       </div>
 
