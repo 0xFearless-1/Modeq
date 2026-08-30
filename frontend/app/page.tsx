@@ -10,6 +10,7 @@ import { CountUp } from "@/components/CountUp";
 import { DecisionDonut } from "@/components/DecisionDonut";
 import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
+import { Waveform } from "@/components/Waveform";
 
 export const dynamic = "force-dynamic";
 
@@ -36,14 +37,15 @@ export default function LandingPage() {
       <section className="hero" style={{ borderTop: "none" }}>
         <div className="hero-grid">
           <div>
-            <motion.span
-              className="kicker"
+            <motion.div
+              className="kicker-row"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Live on GenLayer - Studio, Asimov, Bradbury
-            </motion.span>
+              <Waveform size={0.8} />
+              <span className="kicker">Live on GenLayer - Studio, Asimov, Bradbury</span>
+            </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
@@ -278,9 +280,40 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      <footer>
-        <span>Modeq - built on GenLayer Intelligent Contracts</span>
-        <Link href="/audit">Audit log</Link>
+      <footer className="site-footer">
+        <div>
+          <div className="brand">
+            <Waveform size={0.9} />
+            Modeq
+          </div>
+          <p className="site-footer-blurb">
+            A transparent, consensus-verified content moderation registry built on
+            GenLayer Intelligent Contracts.
+          </p>
+        </div>
+
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li>
+              <Link href="/app">Launch app</Link>
+            </li>
+            <li>
+              <Link href="/audit">Audit log</Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Networks</h4>
+          <ul>
+            <li>GenLayer Studio</li>
+            <li>Asimov testnet</li>
+            <li>Bradbury testnet</li>
+          </ul>
+        </div>
+
+        <div className="site-footer-bottom">Built on GenLayer Intelligent Contracts</div>
       </footer>
     </>
   );

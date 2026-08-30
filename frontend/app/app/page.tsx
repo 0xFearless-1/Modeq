@@ -6,6 +6,8 @@ import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react
 import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
+import { Stepper } from "@/components/Stepper";
+import { RecentFeed } from "@/components/RecentFeed";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,8 @@ const RESULT_ICON = {
   FLAG: AlertTriangle,
   BLOCK: XCircle,
 };
+
+const MAX_LEN = 500;
 
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
@@ -51,6 +55,7 @@ export default function AppPage() {
   }
 
   const ResultIcon = result ? RESULT_ICON[result.decision] : null;
+  const step = !account ? 0 : busy || result ? 2 : 1;
 
   return (
     <>
@@ -63,92 +68,105 @@ export default function AppPage() {
         </p>
       </div>
 
-      <motion.div
-        className="panel"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="row" style={{ marginTop: 0 }}>
-          {account ? (
-            <span className="wallet-chip">
-              <Wallet size={14} strokeWidth={1.8} />
-              {formatAddress(account)}
-            </span>
-          ) : (
-            <button className="btn btn-primary" onClick={handleConnect}>
-              <Wallet size={15} strokeWidth={2} />
-              Connect wallet
-            </button>
-          )}
-        </div>
+      <div className="app-layout">
+        <div>
+          <Stepper current={step} />
 
-        <div style={{ marginTop: "1.1rem" }}>
-          <textarea
-            placeholder="Paste the text to moderate..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={!account || busy}
-          />
-        </div>
-
-        <div className="row">
-          <button
-            className="btn btn-accent"
-            onClick={handleSubmit}
-            disabled={!account || !text.trim() || busy}
+          <motion.div
+            className="panel"
+            style={{ marginTop: 0 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <Send size={15} strokeWidth={2} />
-            Submit for moderation
-          </button>
-          <AnimatePresence>
-            {busy && (
-              <motion.div
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0 }}
-              >
-                <ValidatorPulse />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {error && (
-          <motion.p
-            className="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {error}
-          </motion.p>
-        )}
-
-        <AnimatePresence>
-          {result && ResultIcon && (
-            <motion.div
-              className={`result-card ${result.decision}`}
-              initial={{ opacity: 0, y: 12, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
-            >
-              <div className="result-head">
-                <ResultIcon
-                  size={18}
-                  strokeWidth={2}
-                  color={`var(--${result.decision.toLowerCase()})`}
-                />
-                <span className={`badge ${result.decision}`}>{result.decision}</span>
-                <span className="muted">
-                  {result.primary_category} - {(result.confidence_bps / 100).toFixed(0)}%
-                  confidence
+            <div className="row" style={{ marginTop: 0 }}>
+              {account ? (
+                <span className="wallet-chip">
+                  <Wallet size={14} strokeWidth={1.8} />
+                  {formatAddress(account)}
                 </span>
+              ) : (
+                <button className="btn btn-primary" onClick={handleConnect}>
+                  <Wallet size={15} strokeWidth={2} />
+                  Connect wallet
+                </button>
+              )}
+            </div>
+
+            <div style={{ marginTop: "1.1rem" }}>
+              <textarea
+                placeholder="Paste the text to moderate..."
+                value={text}
+                maxLength={MAX_LEN}
+                onChange={(e) => setText(e.target.value)}
+                disabled={!account || busy}
+              />
+              <div className="char-count">
+                {text.length}/{MAX_LEN}
               </div>
-              <p className="result-text">{result.text}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+            </div>
+
+            <div className="row">
+              <button
+                className="btn btn-accent"
+                onClick={handleSubmit}
+                disabled={!account || !text.trim() || busy}
+              >
+                <Send size={15} strokeWidth={2} />
+                Submit for moderation
+              </button>
+              <AnimatePresence>
+                {busy && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <ValidatorPulse />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {error && (
+              <motion.p
+                className="error"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {error}
+              </motion.p>
+            )}
+
+            <AnimatePresence>
+              {result && ResultIcon && (
+                <motion.div
+                  className={`result-card ${result.decision}`}
+                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+                >
+                  <div className="result-head">
+                    <ResultIcon
+                      size={18}
+                      strokeWidth={2}
+                      color={`var(--${result.decision.toLowerCase()})`}
+                    />
+                    <span className={`badge ${result.decision}`}>{result.decision}</span>
+                    <span className="muted">
+                      {result.primary_category} -{" "}
+                      {(result.confidence_bps / 100).toFixed(0)}% confidence
+                    </span>
+                  </div>
+                  <p className="result-text">{result.text}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+
+        <RecentFeed />
+      </div>
     </>
   );
 }
