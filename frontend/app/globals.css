@@ -1386,6 +1386,7 @@ textarea:disabled {
   grid-template-columns: 1fr 300px;
   gap: 1.75rem;
   align-items: start;
+  margin-top: 2rem;
 }
 
 @media (max-width: 900px) {
