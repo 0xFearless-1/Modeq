@@ -827,6 +827,41 @@ textarea:disabled {
   margin-top: 0.35rem;
 }
 
+.example-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.example-label {
+  font-size: 0.8rem;
+  color: var(--dim);
+  margin-right: 0.15rem;
+}
+
+.example-chip {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.example-chip:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.example-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .row {
   display: flex;
   align-items: center;

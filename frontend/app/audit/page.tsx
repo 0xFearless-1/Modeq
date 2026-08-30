@@ -43,10 +43,10 @@ export default function AuditLogPage() {
   return (
     <>
       <div className="app-header">
-        <h1>Audit log</h1>
+        <h1>Community feed</h1>
         <p>
-          Every moderation decision is public and on-chain - no wallet required to view
-          it.
+          Every post submitted through Modeq, and the consensus verdict it got - public,
+          on-chain, no wallet required to view.
         </p>
       </div>
 

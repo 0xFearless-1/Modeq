@@ -79,10 +79,10 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.12 }}
             >
-              Five GenLayer validators run the same classifier independently on every
-              submission. If they don&apos;t agree, nothing gets written. If they do,
-              fixed threshold logic - not the model - decides ALLOW, FLAG, or BLOCK, and
-              the case goes on a public ledger anyone can check.
+              Post a comment, a forum reply, a DAO message - five GenLayer validators run
+              the same classifier on it independently. If they don&apos;t agree, nothing gets
+              written. If they do, fixed threshold logic - not the model - decides ALLOW,
+              FLAG, or BLOCK, and the post goes on a public ledger anyone can check.
             </motion.p>
 
             <motion.div

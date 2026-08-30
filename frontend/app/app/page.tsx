@@ -19,6 +19,21 @@ const RESULT_ICON = {
 
 const MAX_LEN = 500;
 
+const EXAMPLES = [
+  {
+    label: "Forum comment",
+    text: "Just switched to the new release and it's noticeably faster, great work team!",
+  },
+  {
+    label: "DAO chat message",
+    text: "Voted yes on prop #42, the treasury numbers finally add up.",
+  },
+  {
+    label: "Suspicious post",
+    text: "Congratulations! You've been selected for a free reward, click here to claim now!!!",
+  },
+];
+
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -60,11 +75,12 @@ export default function AppPage() {
   return (
     <>
       <div className="app-header">
-        <h1>Submit for moderation</h1>
+        <h1>Post to the community feed</h1>
         <p>
-          Text is classified by an LLM running independently on multiple GenLayer
-          validators, then a fixed set of deterministic rules decides ALLOW, FLAG, or
-          BLOCK - never the model itself.
+          Write a forum comment, a DAO chat message, a support reply - anything a
+          community would post. It's classified by an LLM running independently on
+          multiple GenLayer validators, then a fixed set of deterministic rules decides
+          ALLOW, FLAG, or BLOCK - never the model itself.
         </p>
       </div>
 
@@ -93,9 +109,24 @@ export default function AppPage() {
               )}
             </div>
 
-            <div style={{ marginTop: "1.1rem" }}>
+            <div className="example-row">
+              <span className="example-label">Try:</span>
+              {EXAMPLES.map((ex) => (
+                <button
+                  key={ex.label}
+                  type="button"
+                  className="example-chip"
+                  onClick={() => setText(ex.text)}
+                  disabled={!account || busy}
+                >
+                  {ex.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ marginTop: "0.75rem" }}>
               <textarea
-                placeholder="Paste the text to moderate..."
+                placeholder="Write a forum comment, a DAO chat message, a support reply..."
                 value={text}
                 maxLength={MAX_LEN}
                 onChange={(e) => setText(e.target.value)}
@@ -113,7 +144,7 @@ export default function AppPage() {
                 disabled={!account || !text.trim() || busy}
               >
                 <Send size={15} strokeWidth={2} />
-                Submit for moderation
+                Post to feed
               </button>
               <AnimatePresence>
                 {busy && (
