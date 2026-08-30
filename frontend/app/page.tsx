@@ -4,7 +4,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check, X, Activity, Users, Globe, ShieldOff } from "lucide-react";
+import {
+  Check,
+  X,
+  Activity,
+  Users,
+  Globe,
+  ShieldOff,
+  Bot,
+  ShieldCheck,
+  ScrollText,
+} from "lucide-react";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
 import { CountUp } from "@/components/CountUp";
@@ -182,6 +192,63 @@ export default function LandingPage() {
           </div>
         </section>
       </Reveal>
+
+      <section className="chatgpt-section">
+        <Reveal>
+          <div className="section-head">
+            <h2>Why not just ask ChatGPT?</h2>
+            <p>
+              Any LLM can classify text - that was never the hard part. The hard part is
+              trusting the answer when nobody else can check it.
+            </p>
+          </div>
+        </Reveal>
+        <RevealGroup className="feature-grid" stagger={0.12}>
+          <RevealItem>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Bot size={18} strokeWidth={1.8} />
+              </div>
+              <h3>One company, one opinion</h3>
+              <p>
+                Ask ChatGPT and you get a single private company&apos;s private answer.
+                Nobody else can verify it, reproduce it, or check it after the fact.
+              </p>
+            </div>
+          </RevealItem>
+          <RevealItem>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <ShieldCheck size={18} strokeWidth={1.8} />
+              </div>
+              <h3>No independent check</h3>
+              <p>
+                Modeq needs 5 separate validators to independently reach the same
+                verdict before anything counts. One manipulated or hallucinating model
+                can&apos;t decide alone - it just gets outvoted.
+              </p>
+            </div>
+          </RevealItem>
+          <RevealItem>
+            <div className="feature-card">
+              <div className="feature-icon">
+                <ScrollText size={18} strokeWidth={1.8} />
+              </div>
+              <h3>No public record</h3>
+              <p>
+                Ask ChatGPT and the answer disappears with the chat. Every Modeq verdict
+                is permanent, public, and auditable by anyone - forever.
+              </p>
+            </div>
+          </RevealItem>
+        </RevealGroup>
+        <Reveal>
+          <p className="chatgpt-closer">
+            Modeq doesn&apos;t replace the LLM. It replaces trusting one company&apos;s
+            LLM with a public, verifiable consensus of them.
+          </p>
+        </Reveal>
+      </section>
 
       <section>
         <Reveal>
