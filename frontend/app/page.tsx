@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
+import { Check, X, Activity, Users, Globe, ShieldOff } from "lucide-react";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
 import { CountUp } from "@/components/CountUp";
-import { DecisionBar } from "@/components/DecisionBar";
+import { DecisionDonut } from "@/components/DecisionDonut";
 import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
 
@@ -50,9 +50,9 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.06 }}
             >
-              Nobody moderates alone.
+              No single model decides
               <br />
-              <em>Five validators do.</em>
+              what gets <em>moderated</em>.
             </motion.h1>
 
             <motion.p
@@ -61,9 +61,10 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.12 }}
             >
-              Modeq classifies every submission with an LLM running independently on
-              multiple GenLayer validators. The model never makes the final call - fixed,
-              auditable code does - and every verdict is written to a public ledger.
+              Five GenLayer validators run the same classifier independently on every
+              submission. If they don&apos;t agree, nothing gets written. If they do,
+              fixed threshold logic - not the model - decides ALLOW, FLAG, or BLOCK, and
+              the case goes on a public ledger anyone can check.
             </motion.p>
 
             <motion.div
@@ -100,33 +101,67 @@ export default function LandingPage() {
 
       <Reveal>
         <section>
-          <div className="stat-strip">
-            <div className="stat">
-              <div className="value">
-                <CountUp value={count} />
+          <div className="dashboard-panel">
+            <div className="dstat-grid">
+              <div className="dstat">
+                <span className="dstat-icon">
+                  <Activity size={17} strokeWidth={1.8} />
+                </span>
+                <div>
+                  <div className="value">
+                    <CountUp value={count} />
+                  </div>
+                  <div className="label">cases moderated live</div>
+                </div>
               </div>
-              <div className="label">cases moderated live</div>
-            </div>
-            <div className="stat">
-              <div className="value">
-                <CountUp value={5} duration={1} />
+              <div className="dstat">
+                <span className="dstat-icon">
+                  <Users size={17} strokeWidth={1.8} />
+                </span>
+                <div>
+                  <div className="value">
+                    <CountUp value={5} duration={1} />
+                  </div>
+                  <div className="label">validators per verdict</div>
+                </div>
               </div>
-              <div className="label">validators per verdict</div>
-            </div>
-            <div className="stat">
-              <div className="value">
-                <CountUp value={3} duration={1} />
+              <div className="dstat">
+                <span className="dstat-icon">
+                  <Globe size={17} strokeWidth={1.8} />
+                </span>
+                <div>
+                  <div className="value">
+                    <CountUp value={3} duration={1} />
+                  </div>
+                  <div className="label">GenLayer networks</div>
+                </div>
               </div>
-              <div className="label">GenLayer networks</div>
+              <div className="dstat">
+                <span className="dstat-icon">
+                  <ShieldOff size={17} strokeWidth={1.8} />
+                </span>
+                <div>
+                  <div className="value allow">0</div>
+                  <div className="label">central authorities</div>
+                </div>
+              </div>
             </div>
-            <div className="stat">
-              <div className="value allow">0</div>
-              <div className="label">central authorities</div>
+
+            <div className="dashboard-donut">
+              <DecisionDonut allow={allow} flag={flag} block={block} />
+              <div className="decision-legend" style={{ marginTop: 0 }}>
+                <span>
+                  <i className="dot-legend allow" /> {allow}
+                </span>
+                <span>
+                  <i className="dot-legend flag" /> {flag}
+                </span>
+                <span>
+                  <i className="dot-legend block" /> {block}
+                </span>
+              </div>
             </div>
           </div>
-          {count !== null && count > 0 && (
-            <DecisionBar allow={allow} flag={flag} block={block} />
-          )}
         </section>
       </Reveal>
 
