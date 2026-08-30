@@ -69,10 +69,12 @@ export function ProductWindow({ cases }: { cases: Case[] }) {
             transition={{ duration: 0.4, delay: 0.3 + i * 0.15 }}
           >
             <div className="pw-card-top">
-              <span className={`badge ${c.decision}`}>{c.decision}</span>
+              <span className={`badge ${c.decision}`}>
+                {c.decision === "BLOCK" ? "removed" : c.decision}
+              </span>
               <span className="pw-conf">{(c.confidence_bps / 100).toFixed(0)}%</span>
             </div>
-            <p>{truncate(c.text, 58)}</p>
+            <p>{c.decision === "BLOCK" ? "Hidden from the feed" : truncate(c.text, 58)}</p>
           </motion.div>
         ))}
       </div>

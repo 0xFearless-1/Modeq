@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { EyeOff, Eye, AlertTriangle } from "lucide-react";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
 
@@ -11,6 +12,7 @@ export default function AuditLogPage() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +38,15 @@ export default function AuditLogPage() {
     };
   }, []);
 
+  function toggleReveal(caseId: number) {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(caseId)) next.delete(caseId);
+      else next.add(caseId);
+      return next;
+    });
+  }
+
   const allow = cases.filter((c) => c.decision === "ALLOW").length;
   const flag = cases.filter((c) => c.decision === "FLAG").length;
   const block = cases.filter((c) => c.decision === "BLOCK").length;
@@ -45,8 +56,9 @@ export default function AuditLogPage() {
       <div className="app-header">
         <h1>Community feed</h1>
         <p>
-          Every post submitted through Modeq, and the consensus verdict it got - public,
-          on-chain, no wallet required to view.
+          This is what the community actually sees. <strong>BLOCKED</strong> posts are
+          hidden from the feed by default - toggle "show original" to audit what was
+          removed and why. Nothing is deleted: every decision stays public on-chain.
         </p>
       </div>
 
@@ -76,24 +88,60 @@ export default function AuditLogPage() {
           </div>
 
           <div className="case-feed">
-            {cases.map((c, i) => (
-              <motion.div
-                key={c.case_id}
-                className={`case-card ${c.decision}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.6) }}
-              >
-                <div className="case-card-top">
-                  <span className={`badge ${c.decision}`}>{c.decision}</span>
-                  <span className="case-meta">
-                    case #{c.case_id} - {c.primary_category} -{" "}
-                    {(c.confidence_bps / 100).toFixed(0)}% confidence
-                  </span>
-                </div>
-                <p className="case-text">{c.text}</p>
-              </motion.div>
-            ))}
+            {cases.map((c, i) => {
+              const isBlocked = c.decision === "BLOCK";
+              const isFlagged = c.decision === "FLAG";
+              const isRevealed = revealed.has(c.case_id);
+
+              return (
+                <motion.div
+                  key={c.case_id}
+                  className={`case-card ${c.decision}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.6) }}
+                >
+                  <div className="case-card-top">
+                    <span className={`badge ${c.decision}`}>
+                      {isBlocked ? "removed from feed" : c.decision}
+                    </span>
+                    <span className="case-meta">
+                      post #{c.case_id} - {c.primary_category} -{" "}
+                      {(c.confidence_bps / 100).toFixed(0)}% confidence
+                    </span>
+                  </div>
+
+                  {isFlagged && (
+                    <div className="flag-banner">
+                      <AlertTriangle size={13} strokeWidth={2} />
+                      Flagged for review - still visible to the community
+                    </div>
+                  )}
+
+                  {isBlocked && !isRevealed ? (
+                    <button
+                      className="reveal-toggle"
+                      onClick={() => toggleReveal(c.case_id)}
+                    >
+                      <Eye size={13} strokeWidth={2} />
+                      Show original post (audit)
+                    </button>
+                  ) : (
+                    <p className="case-text">{c.text}</p>
+                  )}
+
+                  {isBlocked && isRevealed && (
+                    <button
+                      className="reveal-toggle"
+                      onClick={() => toggleReveal(c.case_id)}
+                    >
+                      <EyeOff size={13} strokeWidth={2} />
+                      Hide again
+                    </button>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </>
       )}

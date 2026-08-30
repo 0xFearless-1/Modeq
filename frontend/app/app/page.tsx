@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
@@ -15,6 +16,12 @@ const RESULT_ICON = {
   ALLOW: CheckCircle2,
   FLAG: AlertTriangle,
   BLOCK: XCircle,
+};
+
+const RESULT_MEANING = {
+  ALLOW: "Your post stays visible in the community feed, right away.",
+  FLAG: "Your post stays visible, but is marked for review in the community feed.",
+  BLOCK: "Your post is hidden from the community feed. The decision itself is still public - anyone can audit it.",
 };
 
 const MAX_LEN = 500;
@@ -200,6 +207,10 @@ export default function AppPage() {
                     </span>
                   </div>
                   <p className="result-text">{result.text}</p>
+                  <p className="result-meaning">{RESULT_MEANING[result.decision]}</p>
+                  <Link href="/audit" className="result-feed-link">
+                    See it in the community feed →
+                  </Link>
                 </motion.div>
               )}
             </AnimatePresence>

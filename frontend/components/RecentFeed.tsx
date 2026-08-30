@@ -49,8 +49,10 @@ export function RecentFeed() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: i * 0.06 }}
         >
-          <span className={`badge ${c.decision}`}>{c.decision}</span>
-          <p>{truncate(c.text, 64)}</p>
+          <span className={`badge ${c.decision}`}>
+            {c.decision === "BLOCK" ? "removed from feed" : c.decision}
+          </span>
+          <p>{c.decision === "BLOCK" ? "Hidden - see full audit for details" : truncate(c.text, 64)}</p>
         </motion.div>
       ))}
     </div>
