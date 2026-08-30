@@ -27,10 +27,50 @@ const mono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+const SITE_URL = "https://modeq.unitynodes.com";
+const TITLE = "Modeq - consensus-verified content moderation";
+const DESCRIPTION =
+  "Modeq classifies content with an LLM running independently on five GenLayer validators. A deterministic threshold - not the model - decides ALLOW, FLAG, or BLOCK, and every case is written to a public on-chain audit log.";
+
 export const metadata: Metadata = {
-  title: "Modeq - consensus-verified content moderation",
-  description:
-    "Transparent, consensus-verified content moderation on GenLayer Intelligent Contracts.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: TITLE, template: "%s - Modeq" },
+  description: DESCRIPTION,
+  keywords: [
+    "GenLayer",
+    "Intelligent Contracts",
+    "content moderation",
+    "LLM consensus",
+    "blockchain moderation",
+    "AI moderation",
+    "on-chain audit log",
+  ],
+  authors: [{ name: "Modeq" }],
+  alternates: { canonical: SITE_URL },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Modeq",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Modeq",
+  applicationCategory: "SecurityApplication",
+  operatingSystem: "Web",
+  url: SITE_URL,
+  description: DESCRIPTION,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };
 
 export default function RootLayout({
@@ -41,6 +81,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <div className="navbar">
           <div className="navbar-inner">
             <Link className="brand" href="/">

@@ -13,12 +13,24 @@ export function RecentFeed() {
   const [cases, setCases] = useState<Case[]>([]);
 
   useEffect(() => {
-    totalCases()
-      .then(async (c) => {
+    let cancelled = false;
+
+    async function refresh() {
+      try {
+        const c = await totalCases();
         const all = await listCases(Math.max(0, c - 5), 5);
-        setCases(all.reverse());
-      })
-      .catch(() => setCases([]));
+        if (!cancelled) setCases(all.reverse());
+      } catch {
+        if (!cancelled) setCases([]);
+      }
+    }
+
+    refresh();
+    const id = setInterval(refresh, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, []);
 
   return (
@@ -26,6 +38,7 @@ export function RecentFeed() {
       <div className="side-feed-head">
         <Waveform size={0.85} />
         <span>Recent verdicts</span>
+        <span className="live-dot" title="Live - refreshes every 15s" />
       </div>
       {cases.length === 0 && <p className="muted">No cases yet.</p>}
       {cases.map((c, i) => (

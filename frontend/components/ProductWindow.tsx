@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { Case } from "@/lib/contract";
 
 function truncate(s: string, n: number) {
@@ -9,9 +10,42 @@ function truncate(s: string, n: number) {
 
 export function ProductWindow({ cases }: { cases: Case[] }) {
   const preview = cases.slice(0, 3);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const springX = useSpring(mx, { stiffness: 150, damping: 18 });
+  const springY = useSpring(my, { stiffness: 150, damping: 18 });
+  const rotateX = useTransform(springY, [0, 1], [8, -8]);
+  const rotateY = useTransform(springX, [0, 1], [-10, 10]);
+  const glowX = useTransform(springX, (v) => `${v * 100}%`);
+  const glowY = useTransform(springY, (v) => `${v * 100}%`);
+
+  function handleMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    mx.set((e.clientX - rect.left) / rect.width);
+    my.set((e.clientY - rect.top) / rect.height);
+  }
+
+  function handleLeave() {
+    mx.set(0.5);
+    my.set(0.5);
+  }
 
   return (
-    <div className="product-window">
+    <motion.div
+      ref={ref}
+      className="product-window"
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ rotateX, rotateY, transformPerspective: 900 }}
+    >
+      <motion.div
+        className="pw-glow"
+        style={{ left: glowX, top: glowY }}
+        aria-hidden="true"
+      />
       <div className="product-window-bar">
         <span className="product-window-dot" />
         <span className="product-window-dot" />
@@ -42,6 +76,6 @@ export function ProductWindow({ cases }: { cases: Case[] }) {
           </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

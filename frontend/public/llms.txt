@@ -1,0 +1,25 @@
+# Modeq
+
+> Modeq is a transparent, consensus-verified content moderation registry built on GenLayer Intelligent Contracts. Instead of a single company's model deciding what gets moderated, five GenLayer validators independently classify each submission; a deterministic threshold - not the model - turns that classification into ALLOW, FLAG, or BLOCK, and every case is written to a public, on-chain audit log.
+
+## What it does
+
+- Accepts a piece of text and classifies it against a fixed category set (spam, hate speech, harassment, nsfw, violence, none) using an LLM running independently on multiple GenLayer validators.
+- The model returns structured categories and a confidence score only - it never states a final verdict. Fixed Python thresholds in the Intelligent Contract compute ALLOW / FLAG / BLOCK deterministically.
+- Every case (text, categories, confidence, decision) is stored on-chain and is publicly listable, with no wallet required to read it.
+
+## Pages
+
+- / - product landing page and explanation of the consensus mechanism
+- /app - submit text for moderation (requires a MetaMask-compatible wallet on GenLayer)
+- /audit - public, read-only audit log of every case ever submitted
+
+## Live deployments
+
+- GenLayer Studio (primary demo network)
+- GenLayer Asimov testnet
+- GenLayer Bradbury testnet
+
+## Underlying technology
+
+Built on GenLayer Intelligent Contracts (Python, GenVM runtime) using the equivalence-principle consensus primitive (`gl.eq_principle.strict_eq`) so that a verdict only lands on-chain once independent validators agree. Frontend is a Next.js app talking to the contract via genlayer-js.

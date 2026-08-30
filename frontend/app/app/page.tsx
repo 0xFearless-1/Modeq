@@ -147,11 +147,21 @@ export default function AppPage() {
                   transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
                 >
                   <div className="result-head">
-                    <ResultIcon
-                      size={18}
-                      strokeWidth={2}
-                      color={`var(--${result.decision.toLowerCase()})`}
-                    />
+                    <span className="result-icon-wrap">
+                      {result.decision === "ALLOW" && (
+                        <motion.span
+                          className="icon-ping"
+                          initial={{ scale: 0.6, opacity: 0.55 }}
+                          animate={{ scale: 2.4, opacity: 0 }}
+                          transition={{ duration: 0.9, ease: "easeOut" }}
+                        />
+                      )}
+                      <ResultIcon
+                        size={18}
+                        strokeWidth={2}
+                        color={`var(--${result.decision.toLowerCase()})`}
+                      />
+                    </span>
                     <span className={`badge ${result.decision}`}>{result.decision}</span>
                     <span className="muted">
                       {result.primary_category} -{" "}

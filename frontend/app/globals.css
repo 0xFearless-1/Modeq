@@ -205,7 +205,54 @@ a {
 /* ── Hero ───────────────────────────────────────────── */
 
 .hero {
+  position: relative;
   padding: 4.5rem 0 3.5rem;
+  overflow: hidden;
+}
+
+.hero-wave {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: 1500px;
+  max-width: none;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.07;
+}
+
+.hero-wave-bar {
+  width: 8px;
+  border-radius: 4px;
+  background: var(--accent-gradient);
+  animation: hero-wave-idle 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes hero-wave-idle {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.62);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wave-bar {
+    animation: none;
+  }
+}
+
+.hero > .hero-grid {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-grid {
@@ -844,6 +891,20 @@ textarea:disabled {
   gap: 0.5rem;
 }
 
+.result-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-ping {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: var(--allow);
+}
+
 .result-text {
   margin-top: 0.85rem;
   color: var(--ink);
@@ -934,14 +995,33 @@ textarea:disabled {
 /* ── Product window (hero mockup) ────────────────────── */
 
 .product-window {
+  position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border-strong);
   border-radius: 12px;
   box-shadow: 0 30px 60px -30px rgba(23, 24, 28, 0.22);
-  transform: rotate(1.4deg);
   overflow: hidden;
   max-width: 380px;
   margin: 0 auto;
+  cursor: default;
+}
+
+.pw-glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  margin-left: -110px;
+  margin-top: -110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(15, 124, 236, 0.16), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.product-window-bar,
+.product-window-body {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 860px) {
@@ -1084,6 +1164,25 @@ textarea:disabled {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--allow);
+  display: inline-block;
+  margin-left: auto;
+  animation: live-blink 1.8s ease-in-out infinite;
+}
+
+@keyframes live-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .side-feed-head {

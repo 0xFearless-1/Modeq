@@ -12,6 +12,7 @@ import { DecisionDonut } from "@/components/DecisionDonut";
 import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
 import { Waveform } from "@/components/Waveform";
+import { HeroWave } from "@/components/HeroWave";
 
 export const dynamic = "force-dynamic";
 
@@ -20,13 +21,26 @@ export default function LandingPage() {
   const [cases, setCases] = useState<Case[]>([]);
 
   useEffect(() => {
-    totalCases()
-      .then(async (c) => {
-        setCount(c);
+    let cancelled = false;
+
+    async function refresh() {
+      try {
+        const c = await totalCases();
         const all = await listCases(0, c);
+        if (cancelled) return;
+        setCount(c);
         setCases(all);
-      })
-      .catch(() => setCount(null));
+      } catch {
+        if (!cancelled) setCount((prev) => prev);
+      }
+    }
+
+    refresh();
+    const id = setInterval(refresh, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, []);
 
   const allow = cases.filter((c) => c.decision === "ALLOW").length;
@@ -36,6 +50,7 @@ export default function LandingPage() {
   return (
     <>
       <section className="hero" style={{ borderTop: "none" }}>
+        <HeroWave />
         <div className="hero-grid">
           <div>
             <motion.div

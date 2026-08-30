@@ -13,17 +13,27 @@ export default function AuditLogPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    let cancelled = false;
+
+    async function refresh() {
       try {
         const count = await totalCases();
         const all = await listCases(0, count);
+        if (cancelled) return;
         setCases(all.slice().reverse());
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
+        if (!cancelled) setError(err instanceof Error ? err.message : String(err));
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    })();
+    }
+
+    refresh();
+    const id = setInterval(refresh, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
   }, []);
 
   const allow = cases.filter((c) => c.decision === "ALLOW").length;
