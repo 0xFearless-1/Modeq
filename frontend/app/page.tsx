@@ -22,7 +22,6 @@ import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
 import { Waveform } from "@/components/Waveform";
 import { HeroWave } from "@/components/HeroWave";
-import { SiteFooter } from "@/components/SiteFooter";
 
 export const dynamic = "force-dynamic";
 
@@ -363,8 +362,6 @@ export default function LandingPage() {
           </div>
         </section>
       </Reveal>
-
-      <SiteFooter />
     </>
   );
 }

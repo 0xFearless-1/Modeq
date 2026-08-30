@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
 const display = localFont({
@@ -107,6 +108,7 @@ export default function RootLayout({
           </div>
         </div>
         <div className="shell">{children}</div>
+        <SiteFooter />
       </body>
     </html>
   );
