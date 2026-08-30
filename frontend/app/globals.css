@@ -1552,9 +1552,10 @@ textarea:disabled {
 /* ── Footer (landing) ───────────────────────────────── */
 
 .site-footer {
+  max-width: var(--maxw);
+  margin: 1rem auto 0;
   border-top: 1px solid var(--border);
-  padding: 3rem 0 2rem;
-  margin-top: 1rem;
+  padding: 3rem 1.5rem 2rem;
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
   gap: 2rem;
