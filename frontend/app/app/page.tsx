@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
+import { ValidatorPulse } from "@/components/ValidatorPulse";
 
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
@@ -50,7 +52,12 @@ export default function AppPage() {
         </p>
       </div>
 
-      <div className="panel">
+      <motion.div
+        className="panel"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="row" style={{ marginTop: 0 }}>
           {account ? (
             <span className="muted">Connected: {formatAddress(account)}</span>
@@ -76,23 +83,49 @@ export default function AppPage() {
             onClick={handleSubmit}
             disabled={!account || !text.trim() || busy}
           >
-            {busy ? "Submitting to consensus..." : "Submit for moderation"}
+            Submit for moderation
           </button>
+          <AnimatePresence>
+            {busy && (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                <ValidatorPulse />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {error && <p className="error">{error}</p>}
-
-        {result && (
-          <div className="result-card">
-            <span className={`badge ${result.decision}`}>{result.decision}</span>
-            <p className="muted" style={{ marginTop: "0.75rem" }}>
-              category: {result.primary_category} - confidence:{" "}
-              {(result.confidence_bps / 100).toFixed(0)}%
-            </p>
-            <p className="result-text">{result.text}</p>
-          </div>
+        {error && (
+          <motion.p
+            className="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {error}
+          </motion.p>
         )}
-      </div>
+
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              className="result-card"
+              initial={{ opacity: 0, y: 12, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+            >
+              <span className={`badge ${result.decision}`}>{result.decision}</span>
+              <p className="muted" style={{ marginTop: "0.75rem" }}>
+                category: {result.primary_category} - confidence:{" "}
+                {(result.confidence_bps / 100).toFixed(0)}%
+              </p>
+              <p className="result-text">{result.text}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </>
   );
 }
