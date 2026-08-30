@@ -5,6 +5,8 @@ Intelligent Contracts**.
 
 > **Status:** MVP live on studionet and both GenLayer testnets (Asimov, Bradbury). Text
 > moderation only for now - see [Roadmap](#roadmap).
+>
+> **Live demo:** [modeq.unitynodes.com](https://modeq.unitynodes.com)
 
 ## Why this exists
 

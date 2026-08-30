@@ -76,3 +76,32 @@ different consensus contracts and state).
 Both are the deployer's first successful deploy on that network; a couple of transient
 `Transaction reverted` deploy attempts on Asimov are expected testnet noise (matches prior
 experience on this machine) and are not separately listed - they left no reachable state.
+
+## Live frontend - modeq.unitynodes.com
+
+Self-hosted on the same VPS this project was built on, following that server's existing
+convention for `*.unitynodes.com` (Caddy reverse proxy + PM2), not a third-party host:
+
+- Production build (`next build`) run under PM2 as `modeq-frontend`, `PORT=3211`,
+  persisted with `pm2 save` so it survives `pm2-root.service` restarts/reboots.
+- One new block appended to the shared `/etc/caddy/Caddyfile` (backed up first, validated
+  with `caddy validate` before `systemctl reload caddy`), reusing the existing
+  `*.unitynodes.com` Cloudflare origin certificate and the shared `nextjs_headers` snippet
+  - same pattern as `pulse.unitynodes.com`:
+  ```
+  modeq.unitynodes.com {
+      encode gzip
+      import nextjs_headers
+      tls /etc/ssl/cf-origin-unitynodes.pem /etc/ssl/cf-origin-unitynodes-key.pem
+      reverse_proxy localhost:3211 {
+          lb_try_duration 20s
+          lb_try_interval 250ms
+      }
+  }
+  ```
+- Verified end to end against `localhost` with the Host header forced before any DNS
+  existed (`curl --resolve modeq.unitynodes.com:443:127.0.0.1 ...`) - both `/` and
+  `/audit` returned 200. Confirmed the reload did not disrupt the ~35 other domains
+  already served by this same Caddy instance.
+- DNS: needs a Cloudflare A record `modeq` -> this server's IP, proxied (orange cloud),
+  same as every other `*.unitynodes.com` record - done outside of this repo/session.
