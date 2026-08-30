@@ -8,7 +8,7 @@ import { listCases, totalCases, type Case } from "@/lib/contract";
 import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
 import { CountUp } from "@/components/CountUp";
 import { DecisionBar } from "@/components/DecisionBar";
-import { ConsensusOrb } from "@/components/ConsensusOrb";
+import { ProductWindow } from "@/components/ProductWindow";
 import { LiveTicker } from "@/components/LiveTicker";
 
 export const dynamic = "force-dynamic";
@@ -83,11 +83,11 @@ export default function LandingPage() {
 
           <motion.div
             className="hero-visual"
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15 }}
           >
-            <ConsensusOrb />
+            <ProductWindow cases={cases} />
           </motion.div>
         </div>
       </section>

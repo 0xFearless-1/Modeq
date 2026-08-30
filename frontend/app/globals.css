@@ -780,3 +780,105 @@ textarea:focus {
   background: var(--accent);
   display: inline-block;
 }
+
+/* ── Product window (hero mockup) ────────────────────── */
+
+.product-window {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 30px 60px -30px rgba(23, 24, 28, 0.22);
+  transform: rotate(1.4deg);
+  overflow: hidden;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  .product-window {
+    transform: none;
+  }
+}
+
+.product-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.product-window-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.product-window-url {
+  margin-left: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--dim);
+}
+
+.product-window-body {
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 220px;
+}
+
+.pw-card {
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 0.6rem 0.7rem;
+  background: var(--bg);
+}
+
+.pw-card.ALLOW {
+  border-left-color: var(--allow);
+}
+
+.pw-card.FLAG {
+  border-left-color: var(--flag);
+}
+
+.pw-card.BLOCK {
+  border-left-color: var(--block);
+}
+
+.pw-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.pw-conf {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--dim);
+}
+
+.pw-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.pw-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pw-skeleton-line {
+  height: 10px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+}
