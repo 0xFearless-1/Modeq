@@ -16,8 +16,9 @@ GenLayer:
 
 - Every submission is classified by an LLM running independently on **multiple
   validators**, and the result only lands on-chain if it survives GenLayer's
-  equivalence-principle consensus (`gl.eq_principle.strict_eq`) - no single node's
-  opinion is enough.
+  equivalence-principle consensus (a custom `run_nondet_unsafe` validator that reruns the
+  classification and compares the decision-relevant fields, not a byte-exact match) - no
+  single node's opinion is enough.
 - The model is **not trusted with the final call**. It only returns a structured
   classification (categories + confidence); a small piece of deterministic Python code
   in the contract turns that into ALLOW / FLAG / BLOCK. A model can misclassify content,
@@ -69,9 +70,9 @@ its fix) are in [deploy/NOTES.md](deploy/NOTES.md).
 
 | Network | Contract | Status |
 |---|---|---|
-| studionet | `0x5F1957D3AE0e26dCE709fe9095FE39D37f2eC58a` | 2 live classified cases |
-| Asimov testnet | [`0xA4f786898971380B28c0AaFA9B6bD1f7982844C8`](https://explorer-asimov.genlayer.com/address/0xA4f786898971380B28c0AaFA9B6bD1f7982844C8) | schema-verified, 1 live case |
-| Bradbury testnet | [`0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5`](https://explorer-bradbury.genlayer.com/address/0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5) | schema-verified, 1 live case |
+| studionet | `0x1ed52bc1D7418543DC32ac4Ce9dd6a5E845DAdCb` | 2 live classified cases |
+| Asimov testnet | [`0xB920314324F948B35dA16f688dF5A55162b822f3`](https://explorer-asimov.genlayer.com/address/0xB920314324F948B35dA16f688dF5A55162b822f3) | schema-verified, 1 live case |
+| Bradbury testnet | [`0x3b13928414e17567823e2AB050c3d94487b31fbf`](https://explorer-bradbury.genlayer.com/address/0x3b13928414e17567823e2AB050c3d94487b31fbf) | schema-verified, 1 live case |
 
 ## Frontend - `frontend/`
 

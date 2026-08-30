@@ -25,6 +25,31 @@ Testnet writes occasionally return `VALIDATORS_TIMEOUT` / do not commit on the f
 contract issue; the studionet run below shows the same content classified consistently
 across two independent submissions.
 
+## Consensus-mechanism fix (genlayer-dev skill review)
+
+The official `genlayer-dev` Claude Code plugin (`genlayerlabs/skills`) ships a
+`write-contract` skill whose anti-pattern table flags exactly what the original contract
+did: **`strict_eq()` for LLM calls always risks failing consensus**, because LLM output
+isn't byte-identical across validators. That matches what we saw empirically - one live
+submission on the `strict_eq` version came back `UNDETERMINED` and another needed a
+validator rotation (`num_of_rounds: 4`) before agreeing.
+
+Fixed by replacing `gl.eq_principle.strict_eq(classify)` with a custom
+`gl.vm.run_nondet_unsafe(leader_fn, validator_fn)` pair, per the skill's recommended
+pattern: the decision (ALLOW/FLAG/BLOCK) is computed *inside* the nondet closure, and the
+validator reruns classification independently and compares only the decision-relevant
+fields (`decision`, `primary_category`) rather than requiring an exact match on the whole
+JSON blob (which would also catch confidence-value jitter like 97% vs 99%). Also replaced
+bare `raise Exception(...)` with `gl.vm.UserError("[LLM_ERROR] ...")` per the same skill -
+bare exceptions become unrecoverable VMErrors; a classified, prefixed UserError lets a
+validator that fails to reproduce valid output deliberately disagree (forcing rotation)
+instead of the whole path becoming undebuggable.
+
+All contracts were redeployed after this fix (new addresses below). Both direct-mode
+tests (8/8) and the real `tests/integration/` end-to-end test were re-run against the new
+contract and pass; the studionet exercise below shows two independent submissions landing
+`ACCEPTED` with no rotations needed.
+
 ## studionet (hosted GenLayer Studio) - full functional proof
 
 ```bash
@@ -32,26 +57,22 @@ genlayer network set studionet
 genlayer deploy --contract contracts/moderation_registry.py
 ```
 
-Deployed contract: `0x5F1957D3AE0e26dCE709fe9095FE39D37f2eC58a`.
+Deployed contract: `0x1ed52bc1D7418543DC32ac4Ce9dd6a5E845DAdCb`.
 
 Two real submissions were sent and classified by live multi-validator LLM consensus
-(5 validators, `strict_eq`), each finalized as `MAJORITY_AGREE` / `ACCEPTED`:
+(5 validators, custom `run_nondet_unsafe` validator), each finalized as `AGREE` /
+`ACCEPTED` on the first attempt:
 
 | case_id | text | model output | decision |
 |---|---|---|---|
 | 0 | "Thanks for the quick response, the new update fixed my issue perfectly." | `primary_category: none`, confidence 99% | **ALLOW** |
-| 1 | "Congratulations! You have WON a free prize, click this link now to claim before it expires!!!" | `primary_category: spam`, confidence 99% | **BLOCK** |
+| 1 | "Congratulations! You have WON a free prize, click this link now to claim before it expires!!!" | `primary_category: spam`, confidence 97% | **BLOCK** |
 
-This caught a real bug during testing: the first version of the contract treated ANY high
-`max_confidence` as reason to block, without checking `primary_category`. A live model
-that was 99% confident a message was clean (`primary_category: "none"`) got blocked
-anyway. Fixed in `contracts/moderation_registry.py` (the `primary_category == "none"` ->
-`ALLOW` short-circuit) and re-deployed; both cases above are from the fixed contract.
-
-An earlier submission attempt on this same fixed contract also needed one validator
-rotation before reaching `MAJORITY_AGREE` (`num_of_rounds: 4`) - the protocol retried
-until validators agreed, which is the equivalence principle working as intended when LLM
-outputs vary slightly between validators, not a failure.
+An earlier version of this contract caught a real bug during testing: it treated ANY high
+`max_confidence` as reason to block, without checking `primary_category`, so a model that
+was 99% confident a message was clean (`primary_category: "none"`) got blocked anyway.
+Fixed with the `primary_category == "none"` -> `ALLOW` short-circuit (still present in the
+current contract).
 
 ## Testnet (Asimov + Bradbury) - on-chain, schema-verified, and exercised
 
@@ -60,22 +81,24 @@ Deployed to both testnets so evidence exists regardless of which one the program
 different consensus contracts and state).
 
 **Asimov** (`https://rpc-asimov.genlayer.com`)
-- Contract: `0xA4f786898971380B28c0AaFA9B6bD1f7982844C8`
-- https://explorer-asimov.genlayer.com/address/0xA4f786898971380B28c0AaFA9B6bD1f7982844C8
+- Contract: `0xB920314324F948B35dA16f688dF5A55162b822f3`
+- https://explorer-asimov.genlayer.com/address/0xB920314324F948B35dA16f688dF5A55162b822f3
 - Verified via `genlayer schema` (methods match the source).
 - Exercised: `submit_content("Congratulations! You have WON a free prize...")` ->
-  `case_id 0`, `primary_category: spam`, confidence 95%, **decision: BLOCK**.
+  `case_id 0`, `primary_category: spam`, confidence 99%, **decision: BLOCK**. First
+  attempt returned `LEADER_TIMEOUT` (infra-level, no state change); a retry succeeded.
 
 **Bradbury** (`https://rpc-bradbury.genlayer.com`)
-- Contract: `0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5`
-- https://explorer-bradbury.genlayer.com/address/0x5C4744B35f38557D5F038616Be7bB7ECF6fa13d5
+- Contract: `0x3b13928414e17567823e2AB050c3d94487b31fbf`
+- https://explorer-bradbury.genlayer.com/address/0x3b13928414e17567823e2AB050c3d94487b31fbf
 - Verified via `genlayer schema` (methods match the source).
 - Exercised: `submit_content("Thanks for the quick response...")` -> `case_id 0`,
   `primary_category: none`, confidence 100%, **decision: ALLOW**.
 
 Both are the deployer's first successful deploy on that network; a couple of transient
-`Transaction reverted` deploy attempts on Asimov are expected testnet noise (matches prior
-experience on this machine) and are not separately listed - they left no reachable state.
+`Transaction reverted` deploy attempts seen on earlier deploys to this same testnet are
+expected testnet noise (matches prior experience on this machine) and are not separately
+listed - they left no reachable state.
 
 ## Live frontend - modeq.unitynodes.com
 
