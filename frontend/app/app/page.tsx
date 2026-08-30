@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 
 export const dynamic = "force-dynamic";
+
+const RESULT_ICON = {
+  ALLOW: CheckCircle2,
+  FLAG: AlertTriangle,
+  BLOCK: XCircle,
+};
 
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
@@ -43,6 +50,8 @@ export default function AppPage() {
     }
   }
 
+  const ResultIcon = result ? RESULT_ICON[result.decision] : null;
+
   return (
     <>
       <div className="app-header">
@@ -62,9 +71,13 @@ export default function AppPage() {
       >
         <div className="row" style={{ marginTop: 0 }}>
           {account ? (
-            <span className="muted">Connected: {formatAddress(account)}</span>
+            <span className="wallet-chip">
+              <Wallet size={14} strokeWidth={1.8} />
+              {formatAddress(account)}
+            </span>
           ) : (
             <button className="btn btn-primary" onClick={handleConnect}>
+              <Wallet size={15} strokeWidth={2} />
               Connect wallet
             </button>
           )}
@@ -81,10 +94,11 @@ export default function AppPage() {
 
         <div className="row">
           <button
-            className="btn btn-primary"
+            className="btn btn-accent"
             onClick={handleSubmit}
             disabled={!account || !text.trim() || busy}
           >
+            <Send size={15} strokeWidth={2} />
             Submit for moderation
           </button>
           <AnimatePresence>
@@ -111,18 +125,25 @@ export default function AppPage() {
         )}
 
         <AnimatePresence>
-          {result && (
+          {result && ResultIcon && (
             <motion.div
-              className="result-card"
+              className={`result-card ${result.decision}`}
               initial={{ opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
             >
-              <span className={`badge ${result.decision}`}>{result.decision}</span>
-              <p className="muted" style={{ marginTop: "0.75rem" }}>
-                category: {result.primary_category} - confidence:{" "}
-                {(result.confidence_bps / 100).toFixed(0)}%
-              </p>
+              <div className="result-head">
+                <ResultIcon
+                  size={18}
+                  strokeWidth={2}
+                  color={`var(--${result.decision.toLowerCase()})`}
+                />
+                <span className={`badge ${result.decision}`}>{result.decision}</span>
+                <span className="muted">
+                  {result.primary_category} - {(result.confidence_bps / 100).toFixed(0)}%
+                  confidence
+                </span>
+              </div>
               <p className="result-text">{result.text}</p>
             </motion.div>
           )}

@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 
-const display = Instrument_Serif({
-  subsets: ["latin"],
+const display = localFont({
+  src: [
+    { path: "./fonts/GeneralSans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/GeneralSans-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/GeneralSans-Semibold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/GeneralSans-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-display",
-  weight: ["400"],
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const body = Inter({
@@ -38,7 +44,14 @@ export default function RootLayout({
         <div className="navbar">
           <div className="navbar-inner">
             <Link className="brand" href="/">
-              <span className="brand-mark" />
+              <Image
+                className="brand-mark"
+                src="/logo-mark.png"
+                alt=""
+                width={22}
+                height={22}
+                priority
+              />
               Modeq
             </Link>
             <div className="nav-links">
