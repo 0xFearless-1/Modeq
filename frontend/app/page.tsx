@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Check, X } from "lucide-react";
 import { listCases, totalCases, type Case } from "@/lib/contract";
 import { Reveal, RevealGroup, RevealItem } from "@/components/Reveal";
 import { CountUp } from "@/components/CountUp";
@@ -33,52 +34,45 @@ export default function LandingPage() {
   return (
     <>
       <section className="hero" style={{ borderTop: "none" }}>
-        <div className="aurora">
-          <span />
-          <span />
-          <span />
-        </div>
-
         <div className="hero-grid">
           <div>
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
+            <motion.span
+              className="kicker"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55 }}
-              className="eyebrow"
+              transition={{ duration: 0.5 }}
             >
-              <span className="dot dot-live" />
-              Live on GenLayer Studio, Asimov &amp; Bradbury
-            </motion.div>
+              Live on GenLayer - Studio, Asimov, Bradbury
+            </motion.span>
 
             <motion.h1
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.08 }}
+              transition={{ duration: 0.6, delay: 0.06 }}
             >
-              Nobody moderates
+              Nobody moderates alone.
               <br />
-              alone. <span>Five validators do.</span>
+              <em>Five validators do.</em>
             </motion.h1>
 
             <motion.p
               className="lead"
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.16 }}
+              transition={{ duration: 0.6, delay: 0.12 }}
             >
               Modeq classifies every submission with an LLM running independently on
               multiple GenLayer validators. The model never makes the final call - fixed,
-              auditable code does - and every verdict is written to a public on-chain log.
+              auditable code does - and every verdict is written to a public ledger.
             </motion.p>
 
             <motion.div
               className="hero-ctas"
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.24 }}
+              transition={{ duration: 0.6, delay: 0.18 }}
             >
-              <Link className="btn btn-primary btn-lg btn-shimmer" href="/app">
+              <Link className="btn btn-primary btn-lg" href="/app">
                 Launch app
               </Link>
               <Link className="btn btn-secondary btn-lg" href="/audit">
@@ -89,9 +83,9 @@ export default function LandingPage() {
 
           <motion.div
             className="hero-visual"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
           >
             <ConsensusOrb />
           </motion.div>
@@ -149,19 +143,19 @@ export default function LandingPage() {
               <h3>Black-box moderation</h3>
               <ul>
                 <li>
-                  <span className="compare-mark">✕</span>
+                  <X className="compare-mark" size={16} strokeWidth={2.2} />
                   One company&apos;s model, one opinion, no second vote
                 </li>
                 <li>
-                  <span className="compare-mark">✕</span>
+                  <X className="compare-mark" size={16} strokeWidth={2.2} />
                   Verdicts explained after the fact, if at all
                 </li>
                 <li>
-                  <span className="compare-mark">✕</span>
-                  A cleverly worded prompt can talk the model into anything
+                  <X className="compare-mark" size={16} strokeWidth={2.2} />A
+                  cleverly worded prompt can talk the model into anything
                 </li>
                 <li>
-                  <span className="compare-mark">✕</span>
+                  <X className="compare-mark" size={16} strokeWidth={2.2} />
                   No record a third party can independently check
                 </li>
               </ul>
@@ -170,19 +164,19 @@ export default function LandingPage() {
               <h3>Modeq</h3>
               <ul>
                 <li>
-                  <span className="compare-mark">✓</span>5 validators classify
-                  independently before anything is accepted
+                  <Check className="compare-mark" size={16} strokeWidth={2.2} />5
+                  validators classify independently before anything is accepted
                 </li>
                 <li>
-                  <span className="compare-mark">✓</span>
+                  <Check className="compare-mark" size={16} strokeWidth={2.2} />
                   Structured categories + confidence, not a free-text verdict
                 </li>
                 <li>
-                  <span className="compare-mark">✓</span>
-                  Fixed Python thresholds decide - the model only classifies
+                  <Check className="compare-mark" size={16} strokeWidth={2.2} />
+                  Fixed thresholds decide - the model only classifies
                 </li>
                 <li>
-                  <span className="compare-mark">✓</span>
+                  <Check className="compare-mark" size={16} strokeWidth={2.2} />
                   Every case is public and on-chain, forever
                 </li>
               </ul>
@@ -207,12 +201,14 @@ export default function LandingPage() {
         <RevealGroup className="steps" stagger={0.12}>
           <RevealItem>
             <div className="step">
+              <span className="step-num">01</span>
               <h3>Submit content</h3>
               <p>Text is sent to the Modeq Intelligent Contract on GenLayer.</p>
             </div>
           </RevealItem>
           <RevealItem>
             <div className="step">
+              <span className="step-num">02</span>
               <h3>Independent classification</h3>
               <p>
                 Each validator runs the classifier itself; consensus checks the
@@ -222,6 +218,7 @@ export default function LandingPage() {
           </RevealItem>
           <RevealItem>
             <div className="step">
+              <span className="step-num">03</span>
               <h3>Deterministic verdict</h3>
               <p>
                 Fixed thresholds turn the classification into ALLOW / FLAG / BLOCK and
@@ -235,9 +232,11 @@ export default function LandingPage() {
       <Reveal>
         <section>
           <div className="cta-band">
-            <h2>Try it on a real GenLayer network</h2>
-            <p>Connect a wallet, submit some text, watch consensus decide.</p>
-            <Link className="btn btn-primary btn-lg btn-shimmer" href="/app">
+            <div>
+              <h2>Try it on a real GenLayer network</h2>
+              <p>Connect a wallet, submit some text, watch consensus decide.</p>
+            </div>
+            <Link className="btn btn-primary btn-lg" href="/app">
               Launch app
             </Link>
           </div>

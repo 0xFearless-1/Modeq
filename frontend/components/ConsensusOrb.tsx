@@ -3,11 +3,11 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const VERDICTS: { label: "ALLOW" | "FLAG" | "BLOCK"; color: string }[] = [
-  { label: "ALLOW", color: "var(--allow)" },
-  { label: "BLOCK", color: "var(--block)" },
-  { label: "ALLOW", color: "var(--allow)" },
-  { label: "FLAG", color: "var(--flag)" },
+const VERDICTS: { label: "ALLOW" | "FLAG" | "BLOCK"; var: string }[] = [
+  { label: "ALLOW", var: "--allow" },
+  { label: "BLOCK", var: "--block" },
+  { label: "ALLOW", var: "--allow" },
+  { label: "FLAG", var: "--flag" },
 ];
 
 const NODE_COUNT = 5;
@@ -33,7 +33,12 @@ export function ConsensusOrb() {
   });
 
   return (
-    <svg viewBox="0 0 300 300" className="consensus-orb" role="img" aria-label="Validator consensus animation">
+    <svg
+      viewBox="0 0 300 300"
+      className="consensus-orb"
+      role="img"
+      aria-label="Validator consensus animation"
+    >
       {nodes.map((n, i) => (
         <motion.line
           key={`line-${i}`}
@@ -41,53 +46,46 @@ export function ConsensusOrb() {
           y1={n.y}
           x2={CENTER}
           y2={CENTER}
-          stroke="var(--accent)"
-          strokeWidth={1.4}
-          strokeOpacity={0.35}
-          strokeDasharray="4 6"
-          animate={{ strokeDashoffset: [0, -20] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "linear" }}
+          stroke="var(--border-strong)"
+          strokeWidth={1}
+          strokeDasharray="3 5"
+          animate={{ strokeDashoffset: [0, -16] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
         />
       ))}
 
-      <motion.circle
+      <circle
         cx={CENTER}
         cy={CENTER}
-        r={40}
-        fill="none"
-        stroke={verdict.color}
-        strokeWidth={1.5}
-        strokeOpacity={0.5}
-        animate={{ r: [40, 50, 40], opacity: [0.5, 0, 0.5] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
+        r={36}
+        fill="var(--bg-card)"
+        stroke={`var(${verdict.var})`}
+        strokeWidth={1.2}
       />
-
-      <circle cx={CENTER} cy={CENTER} r={34} fill="var(--bg-card)" stroke="var(--border)" />
       <foreignObject x={CENTER - 34} y={CENTER - 34} width={68} height={68}>
-        <div className="orb-verdict" style={{ color: verdict.color }}>
+        <div className="orb-verdict" style={{ color: `var(${verdict.var})` }}>
           {verdict.label}
         </div>
       </foreignObject>
 
       {nodes.map((n, i) => (
-        <motion.g key={`node-${i}`}>
-          <motion.circle
-            cx={n.x}
-            cy={n.y}
-            r={9}
-            fill="var(--bg-card)"
-            stroke="var(--accent)"
-            strokeWidth={1.5}
-            animate={{ scale: [1, 1.22, 1] }}
-            transition={{
-              duration: 1.4,
-              repeat: Infinity,
-              delay: i * 0.22,
-              ease: "easeInOut",
-            }}
-            style={{ transformOrigin: `${n.x}px ${n.y}px` }}
-          />
-        </motion.g>
+        <motion.circle
+          key={`node-${i}`}
+          cx={n.x}
+          cy={n.y}
+          r={7}
+          fill="var(--bg-card)"
+          stroke="var(--ink)"
+          strokeWidth={1}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{
+            duration: 1.4,
+            repeat: Infinity,
+            delay: i * 0.22,
+            ease: "easeInOut",
+          }}
+          style={{ transformOrigin: `${n.x}px ${n.y}px` }}
+        />
       ))}
     </svg>
   );
