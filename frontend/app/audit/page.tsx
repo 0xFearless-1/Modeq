@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { EyeOff, Eye, AlertTriangle } from "lucide-react";
-import { listCases, totalCases, type Case } from "@/lib/contract";
+import { listCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
 
 export const dynamic = "force-dynamic";
@@ -19,8 +19,7 @@ export default function AuditLogPage() {
 
     async function refresh() {
       try {
-        const count = await totalCases();
-        const all = await listCases(0, count);
+        const all = await listCases(0, 100);
         if (cancelled) return;
         setCases(all.slice().reverse());
       } catch (err) {

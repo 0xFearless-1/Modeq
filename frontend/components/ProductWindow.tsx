@@ -50,7 +50,7 @@ export function ProductWindow({ cases }: { cases: Case[] }) {
         <span className="product-window-dot" />
         <span className="product-window-dot" />
         <span className="product-window-dot" />
-        <span className="product-window-url">modeq.unitynodes.com/audit</span>
+        <span className="product-window-url">Audit log</span>
       </div>
       <div className="product-window-body">
         {preview.length === 0 && (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { listCases, totalCases, type Case } from "@/lib/contract";
+import { listCases, type Case } from "@/lib/contract";
 import { Waveform } from "@/components/Waveform";
 
 function truncate(s: string, n: number) {
@@ -17,9 +17,8 @@ export function RecentFeed() {
 
     async function refresh() {
       try {
-        const c = await totalCases();
-        const all = await listCases(Math.max(0, c - 5), 5);
-        if (!cancelled) setCases(all.reverse());
+        const all = await listCases(0, 100);
+        if (!cancelled) setCases(all.slice(-5).reverse());
       } catch {
         if (!cancelled) setCases([]);
       }

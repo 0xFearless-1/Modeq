@@ -34,8 +34,7 @@ export default function LandingPage() {
 
     async function refresh() {
       try {
-        const c = await totalCases();
-        const all = await listCases(0, c);
+        const [c, all] = await Promise.all([totalCases(), listCases(0, 100)]);
         if (cancelled) return;
         setCount(c);
         setCases(all);
