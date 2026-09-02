@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
-const display = localFont({
-  src: [
-    { path: "./fonts/GeneralSans-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/GeneralSans-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/GeneralSans-Semibold.woff2", weight: "600", style: "normal" },
-    { path: "./fonts/GeneralSans-Bold.woff2", weight: "700", style: "normal" },
-  ],
-  variable: "--font-display",
-  display: "swap",
-});
+const FONTSHARE_CSS =
+  "https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap";
 
 const body = Inter({
   subsets: ["latin"],
@@ -80,7 +71,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={`${body.variable} ${mono.variable}`}>
+      <link rel="preconnect" href="https://api.fontshare.com" />
+      <link rel="stylesheet" href={FONTSHARE_CSS} />
       <body>
         <script
           type="application/ld+json"

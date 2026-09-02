@@ -7,10 +7,21 @@ export const alt = "Modeq - consensus-verified content moderation on GenLayer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OgImage() {
+async function loadGeneralSansBold() {
+  const cssRes = await fetch(
+    "https://api.fontshare.com/v2/css?f[]=general-sans@700&display=swap"
+  );
+  const css = await cssRes.text();
+  const match = css.match(/url\('(\/\/cdn\.fontshare\.com[^']+\.ttf)'\)/);
+  if (!match) throw new Error("Could not resolve the General Sans font URL");
+  const fontRes = await fetch(`https:${match[1]}`);
+  return fontRes.arrayBuffer();
+}
+
+export default async function OgImage() {
   const logoBuffer = readFileSync(join(process.cwd(), "app", "icon.png"));
   const logoSrc = `data:image/png;base64,${logoBuffer.toString("base64")}`;
-  const fontData = readFileSync(join(process.cwd(), "app", "fonts", "GeneralSans-Bold.ttf"));
+  const fontData = await loadGeneralSansBold();
 
   return new ImageResponse(
     (
