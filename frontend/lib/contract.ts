@@ -1,6 +1,7 @@
 "use client";
 
 import { createGenLayerClient, getContractAddress } from "./genlayer/client";
+import { ensureStudioNetwork } from "./genlayer/wallet";
 
 export type Decision = "ALLOW" | "FLAG" | "BLOCK";
 
@@ -45,6 +46,7 @@ export async function totalCases(): Promise<number> {
 }
 
 export async function submitContent(account: string, text: string): Promise<void> {
+  await ensureStudioNetwork();
   const client = createGenLayerClient(account);
   const txHash = await client.writeContract({
     address: getContractAddress() as `0x${string}`,

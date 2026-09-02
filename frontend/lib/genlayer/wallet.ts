@@ -1,5 +1,8 @@
 "use client";
 
+import { studionet } from "genlayer-js/chains";
+import { getStudioUrl } from "./client";
+
 interface EthereumProvider {
   isMetaMask?: boolean;
   request: (args: { method: string; params?: unknown[] }) => Promise<any>;
@@ -16,6 +19,39 @@ export function isMetaMaskInstalled(): boolean {
   return !!window.ethereum?.isMetaMask;
 }
 
+const STUDIO_CHAIN_ID_HEX = `0x${studionet.id.toString(16)}`;
+
+// genlayer-js skips its own chain-id check for Studio-based chains
+// (see assertChainMatch in its client - `if (chainConfig.isStudio) return;`),
+// so a wallet left on an unrelated network (e.g. Ethereum mainnet) would
+// otherwise be asked to sign a transaction meant for GenLayer Studio against
+// whatever chain it currently has active. Enforce the switch ourselves.
+export async function ensureStudioNetwork(): Promise<void> {
+  const currentChainId = await window.ethereum!.request({ method: "eth_chainId" });
+  if (currentChainId === STUDIO_CHAIN_ID_HEX) return;
+
+  try {
+    await window.ethereum!.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: STUDIO_CHAIN_ID_HEX }],
+    });
+  } catch (err: any) {
+    if (err?.code !== 4902) throw err;
+    await window.ethereum!.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: STUDIO_CHAIN_ID_HEX,
+          chainName: studionet.name,
+          rpcUrls: [getStudioUrl()],
+          nativeCurrency: studionet.nativeCurrency,
+          blockExplorerUrls: [studionet.blockExplorers?.default.url],
+        },
+      ],
+    });
+  }
+}
+
 export async function connectMetaMask(): Promise<string> {
   if (!isMetaMaskInstalled()) {
     throw new Error("MetaMask is not installed");
@@ -28,6 +64,8 @@ export async function connectMetaMask(): Promise<string> {
   if (!accounts || accounts.length === 0) {
     throw new Error("No accounts found");
   }
+
+  await ensureStudioNetwork();
 
   return accounts[0];
 }
