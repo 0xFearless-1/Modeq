@@ -1127,20 +1127,15 @@ textarea:disabled {
   margin-top: 0.85rem;
 }
 
-/* ── Ledger (audit log) ─────────────────────────────── */
+/* ── Verified chain (audit log) ─────────────────────── */
 
-.ledger {
+.chain-summary {
   margin-top: 1.5rem;
+  padding: 1.5rem 1.75rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 1px 2px rgba(23, 24, 28, 0.03), 0 20px 40px -28px rgba(23, 24, 28, 0.18);
-  overflow: hidden;
-}
-
-.ledger-header {
-  padding: 1.5rem 1.75rem;
-  border-bottom: 1px solid var(--border);
 }
 
 .category-breakdown-label {
@@ -1160,58 +1155,138 @@ textarea:disabled {
   gap: 0.6rem;
 }
 
-.ledger-row {
-  padding: 1rem 1.75rem;
-  border-bottom: 1px solid var(--border);
+.chain {
+  position: relative;
+  margin-top: 2.25rem;
+  padding-left: 0.1rem;
 }
 
-.ledger-row:last-child {
-  border-bottom: none;
+.chain::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 17px;
+  bottom: 17px;
+  width: 2px;
+  background: var(--border-strong);
 }
 
-.ledger-row:hover {
-  background: var(--bg-elevated);
+.chain-block {
+  position: relative;
+  padding-left: 3.4rem;
+  padding-bottom: 2rem;
 }
 
-.ledger-row-meta {
+.chain-block:last-child {
+  padding-bottom: 0;
+}
+
+.chain-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border-strong);
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+  color: var(--dim);
 }
 
-.ledger-decision {
+.chain-block.ALLOW .chain-node {
+  border-color: var(--allow);
+  color: var(--allow);
+}
+
+.chain-block.FLAG .chain-node {
+  border-color: var(--flag);
+  color: var(--flag);
+}
+
+.chain-block.BLOCK .chain-node {
+  border-color: var(--block);
+  color: var(--block);
+}
+
+.chain-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.chain-decision {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.03em;
 }
 
-.ledger-row.ALLOW .ledger-decision {
+.chain-block.ALLOW .chain-decision {
   color: var(--allow);
 }
 
-.ledger-row.FLAG .ledger-decision {
+.chain-block.FLAG .chain-decision {
   color: var(--flag);
 }
 
-.ledger-row.BLOCK .ledger-decision {
+.chain-block.BLOCK .chain-decision {
   color: var(--block);
 }
 
-.ledger-id,
-.ledger-confidence,
-.ledger-time {
+.chain-confidence,
+.chain-time,
+.chain-id {
   font-family: var(--font-mono);
   font-size: 0.76rem;
   color: var(--dim);
 }
 
-.ledger-time {
+.chain-time {
   margin-left: auto;
 }
 
-.ledger-text {
+.chain-id {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.consensus-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--dim);
+}
+
+.chain-block.ALLOW .consensus-dots,
+.consensus-dots.ALLOW {
+  color: var(--allow);
+}
+
+.chain-block.FLAG .consensus-dots,
+.consensus-dots.FLAG {
+  color: var(--flag);
+}
+
+.chain-block.BLOCK .consensus-dots,
+.consensus-dots.BLOCK {
+  color: var(--block);
+}
+
+.consensus-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.chain-text {
   margin: 0.65rem 0 0;
   color: var(--ink);
   font-size: 0.94rem;

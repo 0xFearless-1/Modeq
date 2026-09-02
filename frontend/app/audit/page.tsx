@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { EyeOff, Eye, AlertTriangle } from "lucide-react";
+import { EyeOff, Eye, AlertTriangle, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
 import { CategoryBreakdown } from "@/components/CategoryBreakdown";
@@ -10,6 +10,12 @@ import { formatTimestamp } from "@/lib/format";
 import { categoryMeta } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
+
+const NODE_ICON = {
+  ALLOW: CheckCircle2,
+  FLAG: AlertTriangle,
+  BLOCK: XCircle,
+};
 
 export default function AuditLogPage() {
   const [cases, setCases] = useState<Case[]>([]);
@@ -84,75 +90,93 @@ export default function AuditLogPage() {
       )}
 
       {cases.length > 0 && (
-        <div className="ledger">
-          <div className="ledger-header">
+        <>
+          <div className="chain-summary">
             <DecisionBar allow={allow} flag={flag} block={block} />
             <CategoryBreakdown cases={cases} />
           </div>
 
-          {cases.map((c, i) => {
-            const isBlocked = c.decision === "BLOCK";
-            const isFlagged = c.decision === "FLAG";
-            const isRevealed = revealed.has(c.case_id);
-            const catMeta = categoryMeta(c.primary_category);
-            const CatIcon = catMeta.icon;
+          <div className="chain">
+            {cases.map((c, i) => {
+              const isBlocked = c.decision === "BLOCK";
+              const isFlagged = c.decision === "FLAG";
+              const isRevealed = revealed.has(c.case_id);
+              const catMeta = categoryMeta(c.primary_category);
+              const CatIcon = catMeta.icon;
+              const NodeIcon = NODE_ICON[c.decision];
 
-            return (
-              <motion.div
-                key={c.case_id}
-                className={`ledger-row ${c.decision}`}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.5) }}
-              >
-                <div className="ledger-row-meta">
-                  <span className={`dot-legend ${c.decision.toLowerCase()}`} />
-                  <span className="ledger-decision">
-                    {isBlocked ? "removed" : c.decision}
+              return (
+                <motion.div
+                  key={c.case_id}
+                  className={`chain-block ${c.decision}`}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.5) }}
+                >
+                  <span className="chain-node">
+                    <NodeIcon size={15} strokeWidth={2} />
                   </span>
-                  <span className={`category-chip inline ${c.primary_category}`}>
-                    <CatIcon size={13} strokeWidth={2} />
-                    {catMeta.label}
-                  </span>
-                  <span className="ledger-confidence">
-                    {(c.confidence_bps / 100).toFixed(0)}%
-                  </span>
-                  <span className="ledger-id">#{c.case_id}</span>
-                  <span className="ledger-time">{formatTimestamp(c.timestamp)}</span>
-                </div>
 
-                {isFlagged && (
-                  <div className="flag-banner">
-                    <AlertTriangle size={13} strokeWidth={2} />
-                    Flagged for review - still visible to the community
+                  <div className="chain-content">
+                    <div className="chain-meta-row">
+                      <span className="chain-decision">
+                        {isBlocked ? "removed" : c.decision}
+                      </span>
+                      <span className={`category-chip inline ${c.primary_category}`}>
+                        <CatIcon size={13} strokeWidth={2} />
+                        {catMeta.label}
+                      </span>
+                      <span className="chain-confidence">
+                        {(c.confidence_bps / 100).toFixed(0)}%
+                      </span>
+                      <span
+                        className="consensus-dots"
+                        title="Confirmed by 5 independent GenLayer validators"
+                      >
+                        <ShieldCheck size={12} strokeWidth={2} />
+                        {Array.from({ length: 5 }).map((_, d) => (
+                          <i key={d} className="consensus-dot" />
+                        ))}
+                      </span>
+                      <span className="chain-time">{formatTimestamp(c.timestamp)}</span>
+                    </div>
+
+                    {isFlagged && (
+                      <div className="flag-banner">
+                        <AlertTriangle size={13} strokeWidth={2} />
+                        Flagged for review - still visible to the community
+                      </div>
+                    )}
+
+                    {isBlocked && !isRevealed ? (
+                      <button
+                        className="reveal-toggle"
+                        onClick={() => toggleReveal(c.case_id)}
+                      >
+                        <Eye size={13} strokeWidth={2} />
+                        Show original post (audit)
+                      </button>
+                    ) : (
+                      <p className="chain-text">{c.text}</p>
+                    )}
+
+                    {isBlocked && isRevealed && (
+                      <button
+                        className="reveal-toggle"
+                        onClick={() => toggleReveal(c.case_id)}
+                      >
+                        <EyeOff size={13} strokeWidth={2} />
+                        Hide again
+                      </button>
+                    )}
+
+                    <span className="chain-id">case #{c.case_id}</span>
                   </div>
-                )}
-
-                {isBlocked && !isRevealed ? (
-                  <button
-                    className="reveal-toggle"
-                    onClick={() => toggleReveal(c.case_id)}
-                  >
-                    <Eye size={13} strokeWidth={2} />
-                    Show original post (audit)
-                  </button>
-                ) : (
-                  <p className="ledger-text">{c.text}</p>
-                )}
-
-                {isBlocked && isRevealed && (
-                  <button
-                    className="reveal-toggle"
-                    onClick={() => toggleReveal(c.case_id)}
-                  >
-                    <EyeOff size={13} strokeWidth={2} />
-                    Hide again
-                  </button>
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </>
       )}
     </>
   );

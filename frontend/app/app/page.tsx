@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle, ShieldCheck } from "lucide-react";
 import { connectMetaMask, formatAddress, getAuthorizedAccount } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 import { Stepper } from "@/components/Stepper";
 import { RecentFeed } from "@/components/RecentFeed";
-import { CATEGORY_META, type CategoryKey } from "@/lib/categories";
+import { CATEGORY_META, categoryMeta, type CategoryKey } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -96,6 +96,8 @@ export default function AppPage() {
   }
 
   const ResultIcon = result ? RESULT_ICON[result.decision] : null;
+  const resultCategoryMeta = result ? categoryMeta(result.primary_category) : null;
+  const ResultCategoryIcon = resultCategoryMeta?.icon;
   const step = !account ? 0 : busy || result ? 2 : 1;
 
   return (
@@ -246,9 +248,23 @@ export default function AppPage() {
                       />
                     </span>
                     <span className={`badge ${result.decision}`}>{result.decision}</span>
+                    {result.primary_category !== "none" && resultCategoryMeta && ResultCategoryIcon && (
+                      <span className={`category-chip inline ${result.primary_category}`}>
+                        <ResultCategoryIcon size={13} strokeWidth={2} />
+                        {resultCategoryMeta.label}
+                      </span>
+                    )}
                     <span className="muted">
-                      {result.primary_category} -{" "}
                       {(result.confidence_bps / 100).toFixed(0)}% confidence
+                    </span>
+                    <span
+                      className={`consensus-dots ${result.decision}`}
+                      title="Confirmed by 5 independent GenLayer validators"
+                    >
+                      <ShieldCheck size={12} strokeWidth={2} />
+                      {Array.from({ length: 5 }).map((_, d) => (
+                        <i key={d} className="consensus-dot" />
+                      ))}
                     </span>
                   </div>
                   <p className="result-text">{result.text}</p>
