@@ -143,12 +143,17 @@ export default function AppPage() {
           <Stepper current={step} />
 
           <motion.div
-            className="panel"
+            className="panel compose-panel"
             style={{ marginTop: 0 }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            <div className="compose-head">
+              <span className="compose-node" />
+              Next block - unconfirmed
+            </div>
+
             <div className="row" style={{ marginTop: 0 }}>
               {account ? (
                 <span className="wallet-chip">
