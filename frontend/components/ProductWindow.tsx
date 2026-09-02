@@ -69,6 +69,7 @@ export function ProductWindow({ cases }: { cases: Case[] }) {
             transition={{ duration: 0.4, delay: 0.3 + i * 0.15 }}
           >
             <div className="pw-card-top">
+              <span className={`dot-legend ${c.decision.toLowerCase()}`} />
               <span className={`badge ${c.decision}`}>
                 {c.decision === "BLOCK" ? "removed" : c.decision}
               </span>

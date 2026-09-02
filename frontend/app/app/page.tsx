@@ -3,23 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Wallet,
-  Send,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  Megaphone,
-  MessageSquareWarning,
-  UserX,
-  EyeOff,
-  Flame,
-} from "lucide-react";
+import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { connectMetaMask, formatAddress, getAuthorizedAccount } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 import { Stepper } from "@/components/Stepper";
 import { RecentFeed } from "@/components/RecentFeed";
+import { CATEGORY_META, type CategoryKey } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +19,12 @@ const RESULT_ICON = {
   BLOCK: XCircle,
 };
 
-const CRITERIA = [
-  { icon: Megaphone, label: "Spam", desc: "ads, scams, promotional links" },
-  { icon: MessageSquareWarning, label: "Hate speech", desc: "attacks on identity or group" },
-  { icon: UserX, label: "Harassment", desc: "targeted abuse or threats" },
-  { icon: EyeOff, label: "NSFW", desc: "sexual or explicit content" },
-  { icon: Flame, label: "Violence", desc: "graphic or violent content" },
+const CRITERIA: { key: CategoryKey; desc: string }[] = [
+  { key: "spam", desc: "ads, scams, promotional links" },
+  { key: "hate_speech", desc: "attacks on identity or group" },
+  { key: "harassment", desc: "targeted abuse or threats" },
+  { key: "nsfw", desc: "sexual or explicit content" },
+  { key: "violence", desc: "graphic or violent content" },
 ];
 
 const RESULT_MEANING = {
@@ -121,17 +111,17 @@ export default function AppPage() {
       </div>
 
       <div className="criteria-panel">
-        <span className="criteria-title">Checked against 5 categories</span>
-        <div className="criteria-grid">
-          {CRITERIA.map((c) => (
-            <div key={c.label} className="criteria-item">
-              <span className="criteria-icon">
-                <c.icon size={17} strokeWidth={1.8} />
+        <div className="criteria-row">
+          <span className="criteria-title">Checked against</span>
+          {CRITERIA.map((c) => {
+            const meta = CATEGORY_META[c.key];
+            return (
+              <span key={c.key} className={`category-chip ${c.key}`} title={c.desc}>
+                <meta.icon size={13} strokeWidth={2} />
+                {meta.label}
               </span>
-              <div className="criteria-label">{c.label}</div>
-              <div className="criteria-desc">{c.desc}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="criteria-scale">
           <span className="criteria-scale-item">
