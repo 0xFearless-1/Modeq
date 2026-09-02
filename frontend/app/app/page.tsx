@@ -58,6 +58,10 @@ const EXAMPLES = [
     label: "Suspicious post",
     text: "Congratulations! You've been selected for a free reward, click here to claim now!!!",
   },
+  {
+    label: "About GenLayer",
+    text: "GenLayer uses decentralized AI-validator consensus to resolve contracts that require judgment, not just code.",
+  },
 ];
 
 export default function AppPage() {
