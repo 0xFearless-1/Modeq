@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { Waveform } from "@/components/Waveform";
 import { categoryMeta } from "@/lib/categories";
+
+const NODE_ICON = {
+  ALLOW: CheckCircle2,
+  FLAG: AlertTriangle,
+  BLOCK: XCircle,
+};
 
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n - 1) + "…" : s;
@@ -37,40 +44,40 @@ export function RecentFeed() {
     <div className="side-feed">
       <div className="side-feed-head">
         <Waveform size={0.85} />
-        <span>Recent verdicts</span>
+        <span>Newest blocks</span>
         <span className="live-dot" title="Live - refreshes every 15s" />
       </div>
-      {cases.length === 0 && <p className="muted">No cases yet.</p>}
-      {cases.map((c, i) => {
-        const catMeta = categoryMeta(c.primary_category);
-        const CatIcon = catMeta.icon;
-        return (
-          <motion.div
-            key={c.case_id}
-            className="side-feed-item"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: i * 0.06 }}
-          >
-            <div className="row" style={{ marginTop: 0, gap: "0.4rem" }}>
-              <span className={`badge ${c.decision}`}>
-                {c.decision === "BLOCK" ? "removed from feed" : c.decision}
+      {cases.length === 0 && <p className="muted">No blocks yet.</p>}
+      <div className="mini-chain">
+        {cases.map((c, i) => {
+          const catMeta = categoryMeta(c.primary_category);
+          const NodeIcon = NODE_ICON[c.decision];
+          return (
+            <motion.div
+              key={c.case_id}
+              className={`mini-chain-block ${c.decision}`}
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.06 }}
+            >
+              <span className="mini-chain-node">
+                <NodeIcon size={11} strokeWidth={2.2} />
               </span>
-              {c.primary_category !== "none" && (
-                <span className={`category-chip inline ${c.primary_category}`}>
-                  <CatIcon size={12} strokeWidth={2} />
-                  {catMeta.label}
+              <div className="mini-chain-content">
+                <span className="mini-chain-label">
+                  {c.decision === "BLOCK" ? "removed" : c.decision.toLowerCase()}
+                  {c.primary_category !== "none" && ` - ${catMeta.label.toLowerCase()}`}
                 </span>
-              )}
-            </div>
-            <p>
-              {c.decision === "BLOCK"
-                ? `Hidden - flagged as ${catMeta.label.toLowerCase()}`
-                : truncate(c.text, 64)}
-            </p>
-          </motion.div>
-        );
-      })}
+                <p>
+                  {c.decision === "BLOCK"
+                    ? "hidden from the feed"
+                    : truncate(c.text, 56)}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }
