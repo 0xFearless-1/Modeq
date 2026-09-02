@@ -206,12 +206,14 @@ export default function LandingPage() {
               <div className="feature-icon">
                 <Bot size={18} strokeWidth={1.8} />
               </div>
-              <h3>One company, one opinion</h3>
-              <p>
-                Ask an AI chatbot and you get a single private company&apos;s private
-                answer. Nobody else can verify it, reproduce it, or check it after the
-                fact.
-              </p>
+              <div className="feature-copy">
+                <h3>One company, one opinion</h3>
+                <p>
+                  Ask an AI chatbot and you get a single private company&apos;s private
+                  answer. Nobody else can verify it, reproduce it, or check it after the
+                  fact.
+                </p>
+              </div>
             </div>
           </RevealItem>
           <RevealItem>
@@ -219,12 +221,14 @@ export default function LandingPage() {
               <div className="feature-icon">
                 <ShieldCheck size={18} strokeWidth={1.8} />
               </div>
-              <h3>No independent check</h3>
-              <p>
-                Modeq needs 5 separate validators to independently reach the same
-                verdict before anything counts. One manipulated or hallucinating model
-                can&apos;t decide alone - it just gets outvoted.
-              </p>
+              <div className="feature-copy">
+                <h3>No independent check</h3>
+                <p>
+                  Modeq needs 5 separate validators to independently reach the same
+                  verdict before anything counts. One manipulated or hallucinating model
+                  can&apos;t decide alone - it just gets outvoted.
+                </p>
+              </div>
             </div>
           </RevealItem>
           <RevealItem>
@@ -232,11 +236,13 @@ export default function LandingPage() {
               <div className="feature-icon">
                 <ScrollText size={18} strokeWidth={1.8} />
               </div>
-              <h3>No public record</h3>
-              <p>
-                Ask an AI chatbot and the answer disappears with the chat. Every Modeq
-                verdict is permanent, public, and auditable by anyone - forever.
-              </p>
+              <div className="feature-copy">
+                <h3>No public record</h3>
+                <p>
+                  Ask an AI chatbot and the answer disappears with the chat. Every Modeq
+                  verdict is permanent, public, and auditable by anyone - forever.
+                </p>
+              </div>
             </div>
           </RevealItem>
         </RevealGroup>

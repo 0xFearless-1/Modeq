@@ -615,6 +615,11 @@ section {
   flex-shrink: 0;
 }
 
+.feature-copy {
+  flex: 1;
+  min-width: 0;
+}
+
 .feature-card h3 {
   font-family: var(--font-display);
   font-weight: 600;
