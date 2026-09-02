@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
-const FONTSHARE_CSS =
-  "https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap";
-
-const body = Inter({
+const body = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-body",
+  weight: ["400", "500", "600", "700"],
 });
 
-const mono = IBM_Plex_Mono({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500"],
+  weight: ["400", "500", "700"],
 });
 
 const SITE_URL = "https://modeq.unitynodes.com";
@@ -72,8 +70,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${body.variable} ${mono.variable}`}>
-      <link rel="preconnect" href="https://api.fontshare.com" />
-      <link rel="stylesheet" href={FONTSHARE_CSS} />
       <body>
         <script
           type="application/ld+json"

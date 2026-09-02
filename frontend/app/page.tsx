@@ -68,7 +68,7 @@ export default function LandingPage() {
               transition={{ duration: 0.5 }}
             >
               <Waveform size={0.8} />
-              <span className="kicker">Live on GenLayer</span>
+              <span className="kicker">Content moderation registry</span>
             </motion.div>
 
             <motion.h1
@@ -76,9 +76,8 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.06 }}
             >
-              No single model decides
-              <br />
-              what gets <em>moderated</em>.
+              Someone decided your post had to go. You can&apos;t see who, why, or check
+              it.
             </motion.h1>
 
             <motion.p
@@ -87,10 +86,10 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.12 }}
             >
-              Post a comment, a forum reply, a DAO message - five GenLayer validators run
-              the same classifier on it independently. If they don&apos;t agree, nothing gets
-              written. If they do, fixed threshold logic - not the model - decides ALLOW,
-              FLAG, or BLOCK, and the post goes on a public ledger anyone can check.
+              Modeq replaces that with a public registry. Five independent GenLayer
+              validators classify every piece of content, fixed thresholds - not a
+              model&apos;s opinion - decide the outcome, and every case stays on-chain and
+              checkable by anyone, forever.
             </motion.p>
 
             <motion.div
@@ -100,10 +99,10 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.18 }}
             >
               <Link className="btn btn-primary btn-lg" href="/app">
-                Launch app
+                Run a real moderation →
               </Link>
               <Link className="btn btn-secondary btn-lg" href="/audit">
-                View audit log
+                Open the public log
               </Link>
             </motion.div>
           </div>

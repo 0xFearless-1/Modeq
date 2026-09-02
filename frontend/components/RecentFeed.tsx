@@ -2,15 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, AlertTriangle, X } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { Waveform } from "@/components/Waveform";
-import { categoryMeta } from "@/lib/categories";
 
-const NODE_ICON = {
-  ALLOW: Check,
-  FLAG: AlertTriangle,
-  BLOCK: X,
+const TONE_CLASS: Record<Case["decision"], string> = {
+  ALLOW: "allow",
+  FLAG: "flag",
+  BLOCK: "block",
 };
 
 function truncate(s: string, n: number) {
@@ -48,36 +46,27 @@ export function RecentFeed() {
         <span className="live-dot" title="Live - refreshes every 15s" />
       </div>
       {cases.length === 0 && <p className="muted">No blocks yet.</p>}
-      <div className="mini-chain">
-        {cases.map((c, i) => {
-          const catMeta = categoryMeta(c.primary_category);
-          const NodeIcon = NODE_ICON[c.decision];
-          return (
-            <motion.div
-              key={c.case_id}
-              className={`mini-chain-block ${c.decision}`}
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.06 }}
-            >
-              <span className="mini-chain-node">
-                <NodeIcon size={11} strokeWidth={2.2} />
-              </span>
-              <div className="mini-chain-content">
-                <span className="mini-chain-label">
-                  {c.decision === "BLOCK" ? "removed" : c.decision.toLowerCase()}
-                  {c.primary_category !== "none" && ` - ${catMeta.label.toLowerCase()}`}
-                </span>
-                <p>
-                  {c.decision === "BLOCK"
-                    ? "hidden from the feed"
-                    : truncate(c.text, 56)}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
+      {cases.map((c, i) => (
+        <motion.div
+          key={c.case_id}
+          className="side-feed-item"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: i * 0.06 }}
+        >
+          <div className="side-feed-row">
+            <span className="side-feed-id">#{c.case_id}</span>
+            <span className={`side-feed-verdict ${TONE_CLASS[c.decision]}`}>
+              {c.decision}
+            </span>
+          </div>
+          <p>
+            {c.decision === "BLOCK"
+              ? `content hidden - blocked for ${c.primary_category}`
+              : truncate(c.text, 64)}
+          </p>
+        </motion.div>
+      ))}
     </div>
   );
 }

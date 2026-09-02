@@ -112,32 +112,6 @@ export default function AppPage() {
         </p>
       </div>
 
-      <div className="criteria-panel">
-        <div className="criteria-row">
-          <span className="criteria-title">Checked against</span>
-          {CRITERIA.map((c) => {
-            const meta = CATEGORY_META[c.key];
-            return (
-              <span key={c.key} className={`category-chip ${c.key}`} title={c.desc}>
-                <meta.icon size={13} strokeWidth={2} />
-                {meta.label}
-              </span>
-            );
-          })}
-        </div>
-        <div className="criteria-scale">
-          <span className="criteria-scale-item">
-            <i className="dot-legend allow" /> no match → <strong>ALLOW</strong>
-          </span>
-          <span className="criteria-scale-item">
-            <i className="dot-legend flag" /> 40-70% confidence → <strong>FLAG</strong>
-          </span>
-          <span className="criteria-scale-item">
-            <i className="dot-legend block" /> &gt;70% confidence → <strong>BLOCK</strong>
-          </span>
-        </div>
-      </div>
-
       <div className="app-layout">
         <div>
           <Stepper current={step} />
@@ -283,7 +257,42 @@ export default function AppPage() {
           </motion.div>
         </div>
 
-        <RecentFeed />
+        <aside className="app-aside">
+          <div className="aside-card">
+            <div className="aside-card-title">What is checked</div>
+            {CRITERIA.map((c) => {
+              const meta = CATEGORY_META[c.key];
+              return (
+                <div key={c.key} className="aside-criteria-row" title={c.desc}>
+                  <meta.icon size={14} strokeWidth={2} />
+                  <span>{meta.label}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="aside-card">
+            <div className="aside-card-title">How the verdict is decided</div>
+            <div className="aside-rule">
+              <div className="aside-rule-verdict allow">ALLOW</div>
+              <p>No category matched, or confidence is under 40%.</p>
+            </div>
+            <div className="aside-rule">
+              <div className="aside-rule-verdict flag">FLAG</div>
+              <p>Confidence lands between 40% and 70%. Stays visible, marked.</p>
+            </div>
+            <div className="aside-rule">
+              <div className="aside-rule-verdict block">BLOCK</div>
+              <p>Confidence is over 70%. Hidden from the feed, kept in the record.</p>
+            </div>
+            <p className="aside-footnote">
+              Thresholds are fixed in the contract. Validators only classify - they never
+              vote on the outcome.
+            </p>
+          </div>
+
+          <RecentFeed />
+        </aside>
       </div>
     </>
   );

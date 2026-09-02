@@ -1,27 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { EyeOff, Eye, AlertTriangle, Check, X, ShieldCheck } from "lucide-react";
-import { listCases, type Case } from "@/lib/contract";
-import { DecisionBar } from "@/components/DecisionBar";
-import { CategoryBreakdown } from "@/components/CategoryBreakdown";
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { listCases, type Case, type Decision } from "@/lib/contract";
+import { getContractAddress } from "@/lib/genlayer/client";
+import { formatAddress } from "@/lib/genlayer/wallet";
 import { formatTimestamp } from "@/lib/format";
 import { categoryMeta } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
-const NODE_ICON = {
-  ALLOW: Check,
-  FLAG: AlertTriangle,
-  BLOCK: X,
-};
+const FILTERS: { key: "all" | Decision; label: string }[] = [
+  { key: "all", label: "All cases" },
+  { key: "ALLOW", label: "ALLOW" },
+  { key: "FLAG", label: "FLAG" },
+  { key: "BLOCK", label: "BLOCK" },
+];
+
+function thresholdTrace(c: Case): string {
+  const pct = (c.confidence_bps / 100).toFixed(0);
+  if (c.primary_category === "none") {
+    return `primary_category returned "none" - automatic ALLOW regardless of confidence.`;
+  }
+  if (c.confidence_bps > 7000) {
+    return `${pct}% confidence exceeds the 70% BLOCK threshold for "${c.primary_category}".`;
+  }
+  if (c.confidence_bps > 4000) {
+    return `${pct}% confidence falls in the 40-70% FLAG range for "${c.primary_category}".`;
+  }
+  return `${pct}% confidence is below the 40% threshold, so it still resolves to ALLOW.`;
+}
 
 export default function AuditLogPage() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [revealed, setRevealed] = useState<Set<number>>(new Set());
+  const [filter, setFilter] = useState<"all" | Decision>("all");
+  const [reveal, setReveal] = useState(false);
+  const [openId, setOpenId] = useState<number | null>(null);
+  const [narrow, setNarrow] = useState(false);
+
+  useEffect(() => {
+    const onResize = () => setNarrow(window.innerWidth < 760);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,28 +70,25 @@ export default function AuditLogPage() {
     };
   }, []);
 
-  function toggleReveal(caseId: number) {
-    setRevealed((prev) => {
-      const next = new Set(prev);
-      if (next.has(caseId)) next.delete(caseId);
-      else next.add(caseId);
-      return next;
-    });
-  }
-
-  const allow = cases.filter((c) => c.decision === "ALLOW").length;
-  const flag = cases.filter((c) => c.decision === "FLAG").length;
-  const block = cases.filter((c) => c.decision === "BLOCK").length;
+  const rows = useMemo(
+    () => cases.filter((c) => filter === "all" || c.decision === filter),
+    [cases, filter]
+  );
 
   return (
     <>
-      <div className="app-header">
-        <h1>Community feed</h1>
-        <p>
-          This is what the community actually sees. <strong>BLOCKED</strong> posts are
-          hidden from the feed by default - toggle "show original" to audit what was
-          removed and why. Nothing is deleted: every decision stays public on-chain.
-        </p>
+      <div className="audit-header">
+        <div className="app-header" style={{ padding: 0 }}>
+          <h1>Public audit log</h1>
+          <p>
+            Every decision Modeq has ever made. No wallet, no account, no rate limit.
+            Blocked content is hidden from the feed by default - the record of it never is.
+          </p>
+        </div>
+        <div className="audit-registry-meta">
+          <div>registry {formatAddress(getContractAddress(), 16)}</div>
+          <div>{cases.length} records - append-only</div>
+        </div>
       </div>
 
       {loading && (
@@ -82,7 +103,6 @@ export default function AuditLogPage() {
           </p>
         </div>
       )}
-
       {!loading && !error && cases.length === 0 && (
         <div className="panel">
           <p className="muted">No cases submitted yet.</p>
@@ -91,90 +111,123 @@ export default function AuditLogPage() {
 
       {cases.length > 0 && (
         <>
-          <div className="chain-summary">
-            <DecisionBar allow={allow} flag={flag} block={block} />
-            <CategoryBreakdown cases={cases} />
+          <div className="audit-toolbar">
+            <div className="audit-chips">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  className={`audit-chip ${filter === f.key ? "active" : ""}`}
+                  onClick={() => setFilter(f.key)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <label className="audit-reveal">
+              <input
+                type="checkbox"
+                checked={reveal}
+                onChange={(e) => setReveal(e.target.checked)}
+              />
+              Reveal blocked content
+            </label>
           </div>
 
-          <div className="chain">
-            {cases.map((c, i) => {
+          {!narrow && (
+            <div className="audit-table-head">
+              <span>Case</span>
+              <span>Content</span>
+              <span>Category</span>
+              <span>Conf.</span>
+              <span>Verdict</span>
+            </div>
+          )}
+
+          <div className="audit-table">
+            {rows.map((c) => {
               const isBlocked = c.decision === "BLOCK";
-              const isFlagged = c.decision === "FLAG";
-              const isRevealed = revealed.has(c.case_id);
+              const hidden = isBlocked && !reveal;
               const catMeta = categoryMeta(c.primary_category);
-              const CatIcon = catMeta.icon;
-              const NodeIcon = NODE_ICON[c.decision];
+              const isOpen = openId === c.case_id;
+              const contentLabel = hidden
+                ? `content hidden - blocked for ${catMeta.label.toLowerCase()}`
+                : c.text;
 
               return (
-                <motion.div
-                  key={c.case_id}
-                  className={`chain-block ${c.decision}`}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.5) }}
-                >
-                  <span className="chain-node">
-                    <NodeIcon size={15} strokeWidth={2} />
-                  </span>
-
-                  <div className="chain-content">
-                    <div className="chain-meta-row">
-                      <span className="chain-decision">
-                        {isBlocked ? "removed" : c.decision}
-                      </span>
-                      <span className={`category-chip inline ${c.primary_category}`}>
-                        <CatIcon size={13} strokeWidth={2} />
-                        {catMeta.label}
-                      </span>
-                      <span className="chain-confidence">
-                        {(c.confidence_bps / 100).toFixed(0)}%
-                      </span>
-                      <span
-                        className="consensus-dots"
-                        title="Confirmed by 5 independent GenLayer validators"
-                      >
-                        <ShieldCheck size={12} strokeWidth={2} />
-                        {Array.from({ length: 5 }).map((_, d) => (
-                          <i key={d} className="consensus-dot" />
-                        ))}
-                      </span>
-                      <span className="chain-time">{formatTimestamp(c.timestamp)}</span>
-                    </div>
-
-                    {isFlagged && (
-                      <div className="flag-banner">
-                        <AlertTriangle size={13} strokeWidth={2} />
-                        Flagged for review - still visible to the community
-                      </div>
-                    )}
-
-                    {isBlocked && !isRevealed ? (
-                      <button
-                        className="reveal-toggle"
-                        onClick={() => toggleReveal(c.case_id)}
-                      >
-                        <Eye size={13} strokeWidth={2} />
-                        Show original post (audit)
-                      </button>
+                <div key={c.case_id} className={`audit-row-wrap ${c.decision}`}>
+                  <div
+                    className="audit-row"
+                    onClick={() => setOpenId(isOpen ? null : c.case_id)}
+                  >
+                    {narrow ? (
+                      <>
+                        <div className="audit-row-top">
+                          <span className="audit-case-id">#{c.case_id}</span>
+                          <span className="audit-verdict">{c.decision}</span>
+                        </div>
+                        <div className={`audit-content ${hidden ? "hidden" : ""}`}>
+                          {contentLabel}
+                        </div>
+                        <div className="audit-row-bottom">
+                          <span>{c.primary_category === "none" ? "-" : catMeta.label}</span>
+                          <span>conf {(c.confidence_bps / 100).toFixed(0)}%</span>
+                        </div>
+                      </>
                     ) : (
-                      <p className="chain-text">{c.text}</p>
+                      <>
+                        <span className="audit-case-id">#{c.case_id}</span>
+                        <span className={`audit-content ${hidden ? "hidden" : ""}`}>
+                          {contentLabel}
+                        </span>
+                        <span className="audit-category">
+                          {c.primary_category === "none" ? "-" : catMeta.label}
+                        </span>
+                        <span className="audit-conf">
+                          {(c.confidence_bps / 100).toFixed(0)}%
+                        </span>
+                        <span className="audit-verdict">{c.decision}</span>
+                      </>
                     )}
-
-                    {isBlocked && isRevealed && (
-                      <button
-                        className="reveal-toggle"
-                        onClick={() => toggleReveal(c.case_id)}
-                      >
-                        <EyeOff size={13} strokeWidth={2} />
-                        Hide again
-                      </button>
-                    )}
-
-                    <span className="chain-id">case #{c.case_id}</span>
                   </div>
-                </motion.div>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        className="audit-detail"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22 }}
+                      >
+                        <div className="audit-detail-grid">
+                          <div>
+                            <div className="audit-detail-label">Why this verdict</div>
+                            <p className="audit-trace-line">{thresholdTrace(c)}</p>
+                            <p className="audit-trace-line">
+                              Confirmed by 5 independent GenLayer validators - this case
+                              could not have reached ACCEPTED otherwise.
+                            </p>
+                          </div>
+                          <div>
+                            <div className="audit-detail-label">Record</div>
+                            <div className="audit-detail-meta">
+                              <div>submitter {formatAddress(c.submitter)}</div>
+                              <div>case #{c.case_id}</div>
+                              <div>{formatTimestamp(c.timestamp)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             })}
+          </div>
+
+          <div className="audit-count">
+            {rows.length} of {cases.length} records shown - the log cannot be edited or
+            pruned
           </div>
         </>
       )}
