@@ -13,6 +13,7 @@ export type Case = {
   primary_category: string;
   confidence_bps: number;
   decision: Decision;
+  timestamp: number;
 };
 
 export async function getCase(caseId: number): Promise<Case> {

@@ -1,6 +1,7 @@
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 
 import json
+import time
 from dataclasses import dataclass
 from genlayer import *
 
@@ -20,6 +21,7 @@ class Case:
     primary_category: str
     confidence_bps: str
     decision: str
+    timestamp: str
 
 
 def _serialize(case: Case) -> dict:
@@ -31,6 +33,7 @@ def _serialize(case: Case) -> dict:
         "primary_category": case.primary_category,
         "confidence_bps": int(case.confidence_bps),
         "decision": case.decision,
+        "timestamp": int(case.timestamp),
     }
 
 
@@ -104,7 +107,9 @@ class ModerationRegistry(gl.Contract):
     @gl.public.write
     def submit_content(self, text: str) -> int:
         def leader_fn():
-            return _classify_once(text)
+            result = _classify_once(text)
+            result["timestamp"] = int(time.time())
+            return result
 
         def validator_fn(leaders_res: gl.vm.Result) -> bool:
             if not isinstance(leaders_res, gl.vm.Return):
@@ -131,6 +136,7 @@ class ModerationRegistry(gl.Contract):
             primary_category=data["primary_category"],
             confidence_bps=str(data["confidence_bps"]),
             decision=data["decision"],
+            timestamp=str(data["timestamp"]),
         )
         self.case_count += u256(1)
         return case_id

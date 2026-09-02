@@ -31,7 +31,7 @@ GenLayer:
 
 ```
 submit_content(text) -> case_id      # classify + store a new case
-get_case(case_id) -> dict            # one case: text, categories, confidence, decision
+get_case(case_id) -> dict            # one case: text, categories, confidence, decision, timestamp
 list_cases(offset, limit) -> list    # paginated audit log
 total_cases() -> int
 ```
@@ -70,9 +70,9 @@ its fix) are in [deploy/NOTES.md](deploy/NOTES.md).
 
 | Network | Contract | Status |
 |---|---|---|
-| studionet | `0x1ed52bc1D7418543DC32ac4Ce9dd6a5E845DAdCb` | 2 live classified cases |
-| Asimov testnet | [`0xB920314324F948B35dA16f688dF5A55162b822f3`](https://explorer-asimov.genlayer.com/address/0xB920314324F948B35dA16f688dF5A55162b822f3) | schema-verified, 1 live case |
-| Bradbury testnet | [`0x3b13928414e17567823e2AB050c3d94487b31fbf`](https://explorer-bradbury.genlayer.com/address/0x3b13928414e17567823e2AB050c3d94487b31fbf) | schema-verified, 1 live case |
+| studionet | `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107` | 1 live classified case |
+| Asimov testnet | [`0xF95A5969c79706C7f4274D4e633315bD014C56Eb`](https://explorer-asimov.genlayer.com/address/0xF95A5969c79706C7f4274D4e633315bD014C56Eb) | schema-verified, 1 live case |
+| Bradbury testnet | [`0x13bfD75B34d2C106EA472F105811194352c30461`](https://explorer-bradbury.genlayer.com/address/0x13bfD75B34d2C106EA472F105811194352c30461) | schema-verified, 1 live case |
 
 ## Frontend - `frontend/`
 

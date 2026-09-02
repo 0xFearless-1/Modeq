@@ -57,16 +57,15 @@ genlayer network set studionet
 genlayer deploy --contract contracts/moderation_registry.py
 ```
 
-Deployed contract: `0x1ed52bc1D7418543DC32ac4Ce9dd6a5E845DAdCb`.
+Deployed contract: `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107`.
 
-Two real submissions were sent and classified by live multi-validator LLM consensus
-(5 validators, custom `run_nondet_unsafe` validator), each finalized as `AGREE` /
-`ACCEPTED` on the first attempt:
+A real submission was sent and classified by live multi-validator LLM consensus
+(5 validators, custom `run_nondet_unsafe` validator), finalized as `MAJORITY_AGREE` /
+`ACCEPTED`:
 
 | case_id | text | model output | decision |
 |---|---|---|---|
-| 0 | "Thanks for the quick response, the new update fixed my issue perfectly." | `primary_category: none`, confidence 99% | **ALLOW** |
-| 1 | "Congratulations! You have WON a free prize, click this link now to claim before it expires!!!" | `primary_category: spam`, confidence 97% | **BLOCK** |
+| 0 | "Just switched to the new release and it's noticeably faster, great work team!" | `primary_category: none`, confidence 99% | **ALLOW** |
 
 An earlier version of this contract caught a real bug during testing: it treated ANY high
 `max_confidence` as reason to block, without checking `primary_category`, so a model that
@@ -80,24 +79,47 @@ Deployed to both testnets so evidence exists regardless of which one the program
 (they are separate networks, same chainId 4221, different consensus contracts and state).
 
 **Asimov** (`https://rpc-asimov.genlayer.com`)
-- Contract: `0xB920314324F948B35dA16f688dF5A55162b822f3`
-- https://explorer-asimov.genlayer.com/address/0xB920314324F948B35dA16f688dF5A55162b822f3
+- Contract: `0xF95A5969c79706C7f4274D4e633315bD014C56Eb`
+- https://explorer-asimov.genlayer.com/address/0xF95A5969c79706C7f4274D4e633315bD014C56Eb
 - Verified via `genlayer schema` (methods match the source).
 - Exercised: `submit_content("Congratulations! You have WON a free prize...")` ->
-  `case_id 0`, `primary_category: spam`, confidence 99%, **decision: BLOCK**. First
-  attempt returned `LEADER_TIMEOUT` (infra-level, no state change); a retry succeeded.
+  `case_id 0`, `primary_category: spam`, confidence 95%, **decision: BLOCK**.
 
 **Bradbury** (`https://rpc-bradbury.genlayer.com`)
-- Contract: `0x3b13928414e17567823e2AB050c3d94487b31fbf`
-- https://explorer-bradbury.genlayer.com/address/0x3b13928414e17567823e2AB050c3d94487b31fbf
+- Contract: `0x13bfD75B34d2C106EA472F105811194352c30461`
+- https://explorer-bradbury.genlayer.com/address/0x13bfD75B34d2C106EA472F105811194352c30461
 - Verified via `genlayer schema` (methods match the source).
 - Exercised: `submit_content("Thanks for the quick response...")` -> `case_id 0`,
   `primary_category: none`, confidence 100%, **decision: ALLOW**.
 
-Both are the deployer's first successful deploy on that network; a couple of transient
-`Transaction reverted` deploy attempts seen on earlier deploys to this same testnet are
-expected testnet noise (matches prior experience on this machine) and are not separately
-listed - they left no reachable state.
+## Timestamp field (real user report)
+
+`Case` had no timestamp at all - the audit log couldn't show when a post was submitted.
+GenVM has no built-in deterministic clock accessor, but `time.time()` called from inside
+`leader_fn()` (already running under `gl.vm.run_nondet_unsafe`, an explicitly
+non-deterministic context) works: `genvm-lint` flags it as a non-deterministic call
+(warning, not an error) since it can't know statically that the call site is already
+inside an approved nondet wrapper, and the value is never compared in `validator_fn` -
+only the leader's accepted result is stored, same as the existing `confidence_bps` jitter
+tolerance. Verified live on studionet: submitted at wall-clock `1788327287`, the stored
+`timestamp` came back as `1788327269` (18s earlier, matching real execution time - not 0,
+not a placeholder). All three networks above were redeployed with this field and
+re-exercised.
+
+## Wallet network guard (real user report, caught by Blockaid)
+
+`genlayer-js`'s own `assertChainMatch` skips its chain-id check entirely for
+Studio-based chains (`if (chainConfig.isStudio) return;`), so a wallet left on an
+unrelated network (e.g. Ethereum mainnet, wallet's default) was asked to sign the
+`submit_content` transaction against whatever chain it currently had active. A user's
+wallet correctly flagged the resulting mainnet request via Blockaid as a deceptive
+request to a malicious address. Fixed in `frontend/lib/genlayer/wallet.ts`: the app now
+checks `eth_chainId` itself and requests `wallet_switchEthereumChain`
+(`wallet_addEthereumChain` first if the network isn't added yet) both at connect time and
+again immediately before every write, instead of trusting the library's check. Verified
+live against the deployed frontend with an injected EIP-1193 provider starting on chain
+`0x1` (mainnet): connect correctly triggers `wallet_switchEthereumChain` to `0xf22f`
+before any signature is requested.
 
 ## Live frontend - modeq.unitynodes.com
 

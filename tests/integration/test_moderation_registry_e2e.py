@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from gltest.helpers import load_fixture
 from gltest.assertions import tx_execution_succeeded
@@ -9,9 +11,11 @@ from tests.integration.fixtures import deploy_registry
 def test_submit_content_end_to_end():
     contract = load_fixture(deploy_registry)
 
+    before = int(time.time())
     receipt = contract.submit_content(
         args=["Thanks for the quick response, this fixed my issue perfectly."]
     ).transact(wait_interval=10000, wait_retries=24)
+    after = int(time.time())
 
     assert tx_execution_succeeded(receipt)
     assert contract.total_cases(args=[]).call() == 1
@@ -26,3 +30,4 @@ def test_submit_content_end_to_end():
         "violence",
         "none",
     )
+    assert before <= case["timestamp"] <= after

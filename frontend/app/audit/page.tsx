@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { EyeOff, Eye, AlertTriangle } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
+import { formatTimestamp } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -106,7 +107,8 @@ export default function AuditLogPage() {
                     </span>
                     <span className="case-meta">
                       post #{c.case_id} - {c.primary_category} -{" "}
-                      {(c.confidence_bps / 100).toFixed(0)}% confidence
+                      {(c.confidence_bps / 100).toFixed(0)}% confidence -{" "}
+                      {formatTimestamp(c.timestamp)}
                     </span>
                   </div>
 
