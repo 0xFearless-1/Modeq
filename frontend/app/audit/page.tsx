@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { EyeOff, Eye, AlertTriangle, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
+import { EyeOff, Eye, AlertTriangle, Check, X, ShieldCheck } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
 import { CategoryBreakdown } from "@/components/CategoryBreakdown";
@@ -12,9 +12,9 @@ import { categoryMeta } from "@/lib/categories";
 export const dynamic = "force-dynamic";
 
 const NODE_ICON = {
-  ALLOW: CheckCircle2,
+  ALLOW: Check,
   FLAG: AlertTriangle,
-  BLOCK: XCircle,
+  BLOCK: X,
 };
 
 export default function AuditLogPage() {

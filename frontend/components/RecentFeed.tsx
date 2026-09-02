@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { Check, AlertTriangle, X } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { Waveform } from "@/components/Waveform";
 import { categoryMeta } from "@/lib/categories";
 
 const NODE_ICON = {
-  ALLOW: CheckCircle2,
+  ALLOW: Check,
   FLAG: AlertTriangle,
-  BLOCK: XCircle,
+  BLOCK: X,
 };
 
 function truncate(s: string, n: number) {
