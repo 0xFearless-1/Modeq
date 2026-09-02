@@ -52,6 +52,12 @@ export async function ensureStudioNetwork(): Promise<void> {
   }
 }
 
+export async function getAuthorizedAccount(): Promise<string | null> {
+  if (!isMetaMaskInstalled()) return null;
+  const accounts: string[] = await window.ethereum!.request({ method: "eth_accounts" });
+  return accounts && accounts.length > 0 ? accounts[0] : null;
+}
+
 export async function connectMetaMask(): Promise<string> {
   if (!isMetaMaskInstalled()) {
     throw new Error("MetaMask is not installed");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -15,7 +15,7 @@ import {
   EyeOff,
   Flame,
 } from "lucide-react";
-import { connectMetaMask, formatAddress } from "@/lib/genlayer/wallet";
+import { connectMetaMask, formatAddress, getAuthorizedAccount } from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 import { Stepper } from "@/components/Stepper";
@@ -66,6 +66,12 @@ export default function AppPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Case | null>(null);
+
+  useEffect(() => {
+    getAuthorizedAccount().then((address) => {
+      if (address) setAccount(address);
+    });
+  }, []);
 
   async function handleConnect() {
     setError(null);
