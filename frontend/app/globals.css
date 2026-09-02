@@ -17,6 +17,16 @@
   --flag-tint: #faf0dc;
   --block: #b5372f;
   --block-tint: #fbebe9;
+  --cat-spam: #a8590f;
+  --cat-spam-tint: #faf0e0;
+  --cat-hate_speech: #6b3fa0;
+  --cat-hate_speech-tint: #f2ecf9;
+  --cat-harassment: #a0335a;
+  --cat-harassment-tint: #f9ecf1;
+  --cat-nsfw: #1f7a7a;
+  --cat-nsfw-tint: #e5f3f3;
+  --cat-violence: #8a2323;
+  --cat-violence-tint: #f7e8e4;
   --radius: 10px;
   --radius-sm: 7px;
   --maxw: 1040px;
@@ -1184,14 +1194,17 @@ textarea:disabled {
 
 .case-card.ALLOW {
   border-left-color: var(--allow);
+  background: var(--allow-tint);
 }
 
 .case-card.FLAG {
   border-left-color: var(--flag);
+  background: var(--flag-tint);
 }
 
 .case-card.BLOCK {
   border-left-color: var(--block);
+  background: var(--block-tint);
 }
 
 .case-card-top {
@@ -1218,13 +1231,23 @@ textarea:disabled {
   line-height: 1.5;
 }
 
+.category-breakdown-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  margin-bottom: 0.7rem;
+}
+
 .category-breakdown {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--border);
 }
 
 .category-chip {
@@ -1241,13 +1264,43 @@ textarea:disabled {
 }
 
 .category-chip strong {
-  color: var(--ink);
+  color: inherit;
   margin-left: 0.15rem;
 }
 
 .category-chip.inline {
   padding: 0.22rem 0.6rem;
   font-size: 0.72rem;
+}
+
+.category-chip.spam {
+  background: var(--cat-spam-tint);
+  border-color: transparent;
+  color: var(--cat-spam);
+}
+
+.category-chip.hate_speech {
+  background: var(--cat-hate_speech-tint);
+  border-color: transparent;
+  color: var(--cat-hate_speech);
+}
+
+.category-chip.harassment {
+  background: var(--cat-harassment-tint);
+  border-color: transparent;
+  color: var(--cat-harassment);
+}
+
+.category-chip.nsfw {
+  background: var(--cat-nsfw-tint);
+  border-color: transparent;
+  color: var(--cat-nsfw);
+}
+
+.category-chip.violence {
+  background: var(--cat-violence-tint);
+  border-color: transparent;
+  color: var(--cat-violence);
 }
 
 .flag-banner {

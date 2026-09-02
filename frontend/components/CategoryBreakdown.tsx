@@ -16,17 +16,20 @@ export function CategoryBreakdown({ cases }: { cases: Case[] }) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="category-breakdown">
-      {entries.map(([key, count]) => {
-        const meta = categoryMeta(key);
-        return (
-          <span key={key} className="category-chip">
-            <meta.icon size={13} strokeWidth={2} />
-            {meta.label}
-            <strong>{count}</strong>
-          </span>
-        );
-      })}
-    </div>
+    <>
+      <span className="category-breakdown-label">Flagged or blocked for</span>
+      <div className="category-breakdown">
+        {entries.map(([key, count]) => {
+          const meta = categoryMeta(key);
+          return (
+            <span key={key} className={`category-chip ${key}`}>
+              <meta.icon size={13} strokeWidth={2} />
+              {meta.label}
+              <strong>{count}</strong>
+            </span>
+          );
+        })}
+      </div>
+    </>
   );
 }
