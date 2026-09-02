@@ -63,6 +63,12 @@ cannot smuggle its own `"decision"` field past validation. The integration test 
 to real GenLayer Studio, submits real content, waits for actual multi-validator
 consensus, and reads the resulting case back on-chain.
 
+Beyond the automated suite, four manual adversarial attacks (prompt injection,
+decision-field smuggling, delimiter injection, jailbreak framing) were submitted through
+the live production app and are still visible in the on-chain audit log - all four were
+correctly classified as spam and blocked. Details and case IDs in
+[deploy/NOTES.md](deploy/NOTES.md#adversarial-testing-manual-red-team-live-studionet).
+
 ## Deployed instances
 
 Full reproduction steps and live on-chain evidence (including a real bug this caught, and
