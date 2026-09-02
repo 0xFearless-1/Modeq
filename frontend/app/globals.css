@@ -7,13 +7,13 @@
   --ink: #f3f3f0;
   --muted: #8b8b95;
   --dim: #6b6b75;
-  --accent: #c6f24e;
-  --accent-2: #e6ff9b;
-  --accent-tint: rgba(198, 242, 78, 0.14);
-  --accent-gradient: linear-gradient(90deg, #c6f24e, #e6ff9b 100%);
-  --accent-ink: #101012;
-  --allow: #c6f24e;
-  --allow-tint: rgba(198, 242, 78, 0.14);
+  --accent: #0f7cec;
+  --accent-2: #18dcd4;
+  --accent-tint: rgba(15, 124, 236, 0.16);
+  --accent-gradient: linear-gradient(90deg, #18dcd4, #12bfe0 50%, #0f7cec);
+  --accent-ink: #ffffff;
+  --allow: #34d399;
+  --allow-tint: rgba(52, 211, 153, 0.16);
   --flag: #f5b33c;
   --flag-tint: rgba(245, 179, 60, 0.14);
   --block: #ff6b5a;
@@ -24,8 +24,8 @@
   --cat-hate_speech-tint: rgba(185, 140, 255, 0.14);
   --cat-harassment: #ff8ac0;
   --cat-harassment-tint: rgba(255, 138, 192, 0.14);
-  --cat-nsfw: #4adfd0;
-  --cat-nsfw-tint: rgba(74, 223, 208, 0.14);
+  --cat-nsfw: #9baed1;
+  --cat-nsfw-tint: rgba(155, 174, 209, 0.14);
   --cat-violence: #ff7a70;
   --cat-violence-tint: rgba(255, 122, 112, 0.14);
   --radius: 10px;
@@ -1548,7 +1548,7 @@ textarea:disabled {
   margin-left: -110px;
   margin-top: -110px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(198, 242, 78, 0.22), transparent 70%);
+  background: radial-gradient(circle, rgba(24, 220, 212, 0.26), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
