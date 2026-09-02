@@ -1,6 +1,6 @@
 # Deploy notes
 
-## Toolchain gotcha (same as the security-lab project)
+## Toolchain gotcha
 
 The pinned Python client (`genlayer-py 0.18`) cannot deploy to the current testnet - it
 fails to decode the consensus contract's `getTransactionData` response. Deploy and call
@@ -77,8 +77,7 @@ current contract).
 ## Testnet (Asimov + Bradbury) - on-chain, schema-verified, and exercised
 
 Deployed to both testnets so evidence exists regardless of which one the program credits
-(same pattern as the security-lab: they are separate networks, same chainId 4221,
-different consensus contracts and state).
+(they are separate networks, same chainId 4221, different consensus contracts and state).
 
 **Asimov** (`https://rpc-asimov.genlayer.com`)
 - Contract: `0xB920314324F948B35dA16f688dF5A55162b822f3`
@@ -102,20 +101,14 @@ listed - they left no reachable state.
 
 ## Live frontend - modeq.unitynodes.com
 
-Self-hosted on the same VPS this project was built on, following that server's existing
-convention for `*.unitynodes.com` (Caddy reverse proxy + PM2), not a third-party host:
+Self-hosted (Caddy reverse proxy + PM2), not a third-party host:
 
 - Production build (`next build`) run under PM2 as `modeq-frontend`, `PORT=3211`,
-  persisted with `pm2 save` so it survives `pm2-root.service` restarts/reboots.
-- One new block appended to the shared `/etc/caddy/Caddyfile` (backed up first, validated
-  with `caddy validate` before `systemctl reload caddy`), reusing the existing
-  `*.unitynodes.com` Cloudflare origin certificate and the shared `nextjs_headers` snippet
-  - same pattern as `pulse.unitynodes.com`:
+  persisted with `pm2 save` so it survives restarts/reboots.
+- Caddy terminates TLS and reverse-proxies to the local process:
   ```
   modeq.unitynodes.com {
       encode gzip
-      import nextjs_headers
-      tls /etc/ssl/cf-origin-unitynodes.pem /etc/ssl/cf-origin-unitynodes-key.pem
       reverse_proxy localhost:3211 {
           lb_try_duration 20s
           lb_try_interval 250ms
@@ -124,7 +117,5 @@ convention for `*.unitynodes.com` (Caddy reverse proxy + PM2), not a third-party
   ```
 - Verified end to end against `localhost` with the Host header forced before any DNS
   existed (`curl --resolve modeq.unitynodes.com:443:127.0.0.1 ...`) - both `/` and
-  `/audit` returned 200. Confirmed the reload did not disrupt the ~35 other domains
-  already served by this same Caddy instance.
-- DNS: needs a Cloudflare A record `modeq` -> this server's IP, proxied (orange cloud),
-  same as every other `*.unitynodes.com` record - done outside of this repo/session.
+  `/audit` returned 200.
+- DNS: a proxied Cloudflare A record pointing `modeq` at the server.
