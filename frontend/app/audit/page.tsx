@@ -5,7 +5,9 @@ import { motion } from "framer-motion";
 import { EyeOff, Eye, AlertTriangle } from "lucide-react";
 import { listCases, type Case } from "@/lib/contract";
 import { DecisionBar } from "@/components/DecisionBar";
+import { CategoryBreakdown } from "@/components/CategoryBreakdown";
 import { formatTimestamp } from "@/lib/format";
+import { categoryMeta } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
 
@@ -85,6 +87,7 @@ export default function AuditLogPage() {
         <>
           <div className="panel">
             <DecisionBar allow={allow} flag={flag} block={block} />
+            <CategoryBreakdown cases={cases} />
           </div>
 
           <div className="case-feed">
@@ -92,6 +95,8 @@ export default function AuditLogPage() {
               const isBlocked = c.decision === "BLOCK";
               const isFlagged = c.decision === "FLAG";
               const isRevealed = revealed.has(c.case_id);
+              const catMeta = categoryMeta(c.primary_category);
+              const CatIcon = catMeta.icon;
 
               return (
                 <motion.div
@@ -105,9 +110,12 @@ export default function AuditLogPage() {
                     <span className={`badge ${c.decision}`}>
                       {isBlocked ? "removed from feed" : c.decision}
                     </span>
+                    <span className={`category-chip inline ${c.primary_category}`}>
+                      <CatIcon size={13} strokeWidth={2} />
+                      {catMeta.label}
+                    </span>
                     <span className="case-meta">
-                      post #{c.case_id} - {c.primary_category} -{" "}
-                      {(c.confidence_bps / 100).toFixed(0)}% confidence -{" "}
+                      post #{c.case_id} - {(c.confidence_bps / 100).toFixed(0)}% confidence -{" "}
                       {formatTimestamp(c.timestamp)}
                     </span>
                   </div>

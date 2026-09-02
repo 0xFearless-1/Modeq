@@ -1218,6 +1218,38 @@ textarea:disabled {
   line-height: 1.5;
 }
 
+.category-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+
+.category-chip strong {
+  color: var(--ink);
+  margin-left: 0.15rem;
+}
+
+.category-chip.inline {
+  padding: 0.22rem 0.6rem;
+  font-size: 0.72rem;
+}
+
 .flag-banner {
   display: flex;
   align-items: center;
