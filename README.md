@@ -88,6 +88,17 @@ cannot reproduce valid output votes against the leader instead of storing bad da
   </tr>
 </table>
 
+### Transaction lifecycle
+
+A write is not a spinner. `/app` follows the transaction through the wallet, the send, the
+validators' consensus and the read-back, using the status the chain reports. The capture
+below is a real submission on studionet: three of the five validators agreed, which is
+enough for consensus, and the app says exactly that.
+
+<p align="center">
+  <img src="docs/screenshots/lifecycle.png" alt="Transaction progress: signed, sent with explorer link, accepted by a majority (3 of 5), case recorded" width="560">
+</p>
+
 ## The contract
 
 [`contracts/moderation_registry.py`](contracts/moderation_registry.py)
@@ -109,11 +120,11 @@ change, and the real bug it fixed, is in [deploy/NOTES.md](deploy/NOTES.md).
 
 | Network | Contract | Cases |
 |---|---|---|
-| GenLayer Studio (studionet), used by the live app | `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107` | 18 (9 ALLOW, 9 BLOCK) |
+| GenLayer Studio (studionet), used by the live app | `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107` | live on the [audit page](https://modeq.unitynodes.com/audit) |
 | Asimov testnet | [`0xF95A5969c79706C7f4274D4e633315bD014C56Eb`](https://explorer-asimov.genlayer.com/address/0xF95A5969c79706C7f4274D4e633315bD014C56Eb) | 1 |
 | Bradbury testnet | [`0x13bfD75B34d2C106EA472F105811194352c30461`](https://explorer-bradbury.genlayer.com/address/0x13bfD75B34d2C106EA472F105811194352c30461) | 1 |
 
-Counts are read from the chain with `total_cases()`. Reproduction steps are in
+Case counts come from `total_cases()` on each contract. Reproduction steps are in
 [deploy/NOTES.md](deploy/NOTES.md).
 
 ## Security testing
