@@ -34,6 +34,22 @@ MetaMask has to be on the GenLayer network to sign `submit_content`. The app che
 needed) at connect time and again right before every write, because the client library
 skips its own chain check for Studio-based chains.
 
+## Transaction lifecycle
+
+`/app` shows every stage of a write instead of a spinner:
+
+1. **Confirm in your wallet**: network switch if needed, then the signature request.
+2. **Sent to GenLayer**: the transaction hash with a link to the Studio explorer.
+3. **Validators reach consensus**: the live status reported by the chain (queued,
+   proposing, committing, accepted), how many validators have voted, and elapsed time.
+4. **Verdict recorded on-chain**: the new case is read back and matched to the submitting
+   wallet, so concurrent users never see each other's result.
+
+Failures are distinct and carry the transaction hash when there is one: a rejected
+signature, no consensus (`UNDETERMINED` or `CANCELED`), a submission the contract rejected
+after the validators accepted the transaction, and a timeout. The tracking logic lives in
+[lib/tx.ts](lib/tx.ts) and is covered by `npm test`.
+
 ## Structure
 
 ```
@@ -46,6 +62,7 @@ app/
 components/           SiteNav, Reveal, ScrollSteps, ProductWindow, RecentFeed, ...
 lib/
   contract.ts         typed wrapper over the contract methods
+  tx.ts               transaction tracker: statuses, votes, failure classification
   genlayer/           client and wallet helpers, including the network guard
   categories.tsx      category labels and icons
 public/               logo, favicon, llms.txt

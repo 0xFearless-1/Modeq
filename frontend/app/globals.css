@@ -1824,6 +1824,16 @@ textarea:disabled {
   opacity: 0.8;
 }
 
+.consensus-dot.off {
+  opacity: 0.25;
+}
+
+.consensus-count {
+  margin-left: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
 .category-chip {
   display: inline-flex;
   align-items: center;
@@ -2331,4 +2341,210 @@ textarea:disabled {
 
 .audit-row-wrap {
   scroll-margin-top: 96px;
+}
+
+.tx {
+  margin-top: 1.4rem;
+  padding: 1.3rem 1.4rem 0.45rem;
+  border-radius: 16px;
+  border: 1px solid var(--hairline);
+  background: var(--bg-elevated);
+  box-shadow: var(--inner-highlight);
+}
+
+.tx-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tx-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: 0.9rem;
+  padding-bottom: 1.15rem;
+}
+
+.tx-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 30px;
+  bottom: 2px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--hairline-strong);
+  transition: background-color 0.5s var(--ease-out);
+}
+
+.tx-step.done:not(:last-child)::before {
+  background: rgba(52, 211, 153, 0.55);
+}
+
+.tx-marker {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hairline-strong);
+  background: var(--bg-card);
+  color: var(--dim);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  transition:
+    background-color 0.4s var(--ease-out),
+    border-color 0.4s var(--ease-out),
+    color 0.4s var(--ease-out);
+}
+
+.tx-step.done .tx-marker {
+  background: var(--allow-tint);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: var(--allow);
+}
+
+.tx-step.active .tx-marker {
+  border-color: var(--accent-2);
+}
+
+.tx-step.failed .tx-marker {
+  background: var(--block-tint);
+  border-color: rgba(255, 107, 90, 0.5);
+  color: var(--block);
+}
+
+.tx-pulse {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+.tx-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-2);
+  animation: tx-ring 1.6s var(--ease-out) infinite;
+}
+
+@keyframes tx-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.tx-title {
+  padding-top: 3px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--dim);
+  transition: color 0.4s var(--ease-out);
+}
+
+.tx-step.active .tx-title,
+.tx-step.done .tx-title,
+.tx-step.failed .tx-title {
+  color: var(--ink);
+}
+
+.tx-detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.75rem;
+  margin-top: 0.2rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-step.pending .tx-detail {
+  color: var(--dim);
+}
+
+.tx-hash {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+
+.tx-link,
+.tx-failure a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tx-link:hover,
+  .tx-failure a:hover {
+    text-decoration: underline;
+  }
+}
+
+.tx-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tx-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hairline-strong);
+  transition: background-color 0.4s var(--ease-out);
+}
+
+.tx-dot.agree {
+  background: var(--allow);
+}
+
+.tx-dot.disagree {
+  background: var(--block);
+}
+
+.tx-failure {
+  margin: 0 -0.35rem 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--block-tint);
+  border: 1px solid rgba(255, 107, 90, 0.28);
+}
+
+.tx-failure p {
+  margin: 0 0 0.45rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.tx-failure p:last-child {
+  margin-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-pulse::after {
+    animation: none;
+    opacity: 0.5;
+    transform: scale(1);
+  }
 }

@@ -38,8 +38,8 @@ decision, with no trail a third party can verify.
 Modeq moves the decision itself onto GenLayer and makes the result public.
 
 1. **Independent classification.** A submission is classified by an LLM that runs
-   independently on several GenLayer validators. The result only lands on-chain if the
-   validators agree on the decision-relevant fields.
+   independently on a set of five GenLayer validators. The result only lands on-chain if
+   a majority of them agree on the decision-relevant fields.
 2. **The model never gets the final call.** It returns a structured classification
    (categories plus a confidence score). Fixed thresholds written in the contract turn
    that into ALLOW, FLAG or BLOCK. A model can misclassify, but it cannot talk its way
@@ -83,7 +83,7 @@ cannot reproduce valid output votes against the leader instead of storing bad da
     <td width="50%"><img src="docs/screenshots/audit.png" alt="Public audit log"></td>
   </tr>
   <tr>
-    <td align="center"><b>/app</b> - submit text from a wallet and watch consensus decide</td>
+    <td align="center"><b>/app</b> - submit text from a wallet and follow the transaction through consensus</td>
     <td align="center"><b>/audit</b> - every case ever made, filterable, with the rule that fired</td>
   </tr>
 </table>
@@ -160,6 +160,7 @@ cp .env.example .env
 npm install
 npm run dev        # http://localhost:3000
 npm run build      # production build
+npm test           # transaction tracker tests
 ```
 
 Connect MetaMask on `/app`. The app switches the wallet to the GenLayer network before

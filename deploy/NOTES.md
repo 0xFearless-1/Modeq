@@ -150,6 +150,21 @@ against a *mocked* non-compliant response, via the direct-mode unit test
 actually got fooled into producing one. Worth being upfront about rather than implying
 both layers were proven live.
 
+## Transaction lifecycle in the app (observed on studionet)
+
+`/app` follows each write through wallet, send, consensus and read-back, using the
+transaction status the chain reports. Two real submissions were tracked end to end:
+
+- statuses seen: `PENDING`, `PROPOSING`, `COMMITTING`, `ACCEPTED`, reached about 14
+  seconds after the transaction was sent;
+- votes are reported per validator: in one run 4 validators voted `agree` and 1 stayed
+  `idle`, in another 3 of 5 agreed. Consensus is by majority, so the app says "3 of 5
+  validators agreed" rather than claiming all five confirmed.
+
+Wallet rejection, `UNDETERMINED`, an `ACCEPTED` transaction whose execution ended in a
+contract error, and timeouts each get their own message. These paths are covered by the
+unit tests in `frontend/lib/tx.test.ts`.
+
 ## Live frontend - modeq.unitynodes.com
 
 Self-hosted rather than on a third-party platform: a production `next build` served by

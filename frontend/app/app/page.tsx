@@ -16,8 +16,9 @@ import {
   formatAddress,
   getAuthorizedAccount,
 } from "@/lib/genlayer/wallet";
-import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
-import { ValidatorPulse } from "@/components/ValidatorPulse";
+import { findCaseSince, submitContent, type Case } from "@/lib/contract";
+import { IDLE_TX, TxError, describeFailure, type TxState, type TxUpdate } from "@/lib/tx";
+import { TxProgress } from "@/components/TxProgress";
 import { Stepper } from "@/components/Stepper";
 import { RecentFeed } from "@/components/RecentFeed";
 import { CATEGORY_META, categoryMeta, type CategoryKey } from "@/lib/categories";
@@ -72,6 +73,7 @@ export default function AppPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Case | null>(null);
+  const [tx, setTx] = useState<TxState>(IDLE_TX);
 
   useEffect(() => {
     getAuthorizedAccount().then((address) => {
@@ -94,14 +96,26 @@ export default function AppPage() {
     setBusy(true);
     setError(null);
     setResult(null);
+    setTx({ ...IDLE_TX, phase: "network" });
+
+    const patch = (update: TxUpdate) => setTx((prev) => ({ ...prev, ...update }));
+
     try {
-      await submitContent(account, text.trim());
-      const count = await totalCases();
-      const latest = await getCase(count - 1);
+      const countBefore = await submitContent(account, text.trim(), patch);
+      patch({ phase: "accepted" });
+      const latest = await findCaseSince(account, countBefore);
+      patch({ phase: "recorded" });
       setResult(latest);
       setText("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      const failure = describeFailure(err);
+      const hash = err instanceof TxError ? err.hash : null;
+      setTx((prev) => ({
+        ...prev,
+        phase: "failed",
+        hash: prev.hash ?? hash,
+        failure: { ...failure, at: prev.phase },
+      }));
     } finally {
       setBusy(false);
     }
@@ -200,18 +214,11 @@ export default function AppPage() {
                     <Send size={15} strokeWidth={1.75} />
                   </span>
                 </button>
-                <AnimatePresence>
-                  {busy && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <ValidatorPulse />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
+
+              {tx.phase !== "idle" && (
+                <TxProgress tx={tx} caseId={result?.case_id ?? null} />
+              )}
 
               {error && (
                 <motion.p
@@ -272,12 +279,24 @@ export default function AppPage() {
                         </span>
                         <span
                           className={`consensus-dots ${result.decision}`}
-                          title="Confirmed by 5 independent GenLayer validators"
+                          title={
+                            tx.votes
+                              ? `${tx.votes.agree} of ${tx.votes.total} validators agreed`
+                              : "Accepted by validator consensus"
+                          }
                         >
                           <ShieldCheck size={12} strokeWidth={1.75} aria-hidden="true" />
-                          {Array.from({ length: 5 }).map((_, d) => (
-                            <i key={d} className="consensus-dot" />
+                          {Array.from({ length: tx.votes?.total ?? 5 }).map((_, d) => (
+                            <i
+                              key={d}
+                              className={`consensus-dot ${tx.votes && d >= tx.votes.agree ? "off" : ""}`}
+                            />
                           ))}
+                          {tx.votes && (
+                            <span className="consensus-count">
+                              {tx.votes.agree} of {tx.votes.total} agreed
+                            </span>
+                          )}
                         </span>
                       </div>
                       <p className="result-text">{result.text}</p>
