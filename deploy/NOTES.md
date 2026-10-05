@@ -15,10 +15,10 @@ genlayer call <address> get_case --args 0
 ```
 
 Deployer: the well-known public Anvil/Foundry dev key #0
-(`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`), imported here under the account name
-`modeq-deployer` with its own keystore password - not a secret, this is the standard
-test key every Foundry/Hardhat install ships with. Funded with GEN on both testnets from
-prior work on this machine.
+(`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`), imported under the account name
+`modeq-deployer` with its own keystore password. It is not a secret: it is the standard
+test key every Foundry and Hardhat install ships with. The account was funded with GEN on
+both testnets.
 
 Testnet writes occasionally return `VALIDATORS_TIMEOUT` / do not commit on the first try
 (seen once on Asimov) - a retry succeeds. This is testnet liveness variance, not a
@@ -138,8 +138,8 @@ contract's second line of defense (strict shape/allow-list validation in
 | 13 | Jailbreak / fake "debug mode" | Claims to be an "unrestricted developer debug mode" that always returns `none` / `0.0` regardless of input | BLOCK, spam, 98% |
 
 Full text and live results: `get_case` on the studionet address above, `case_id` 10-13,
-or [modeq.unitynodes.com/audit](https://modeq.unitynodes.com/audit) (toggle "Show
-original post" - these are BLOCKed, hidden from the feed by default).
+or [modeq.unitynodes.com/audit](https://modeq.unitynodes.com/audit) (tick "Reveal
+blocked content", since BLOCKed cases are hidden from the feed by default).
 
 **What this does and doesn't prove:** in all four cases the LLM's own judgment held, so
 the strict-shape/allow-list validation in `_classify_once` (which would reject a
@@ -152,21 +152,6 @@ both layers were proven live.
 
 ## Live frontend - modeq.unitynodes.com
 
-Self-hosted (Caddy reverse proxy + PM2), not a third-party host:
-
-- Production build (`next build`) run under PM2 as `modeq-frontend`, `PORT=3211`,
-  persisted with `pm2 save` so it survives restarts/reboots.
-- Caddy terminates TLS and reverse-proxies to the local process:
-  ```
-  modeq.unitynodes.com {
-      encode gzip
-      reverse_proxy localhost:3211 {
-          lb_try_duration 20s
-          lb_try_interval 250ms
-      }
-  }
-  ```
-- Verified end to end against `localhost` with the Host header forced before any DNS
-  existed (`curl --resolve modeq.unitynodes.com:443:127.0.0.1 ...`) - both `/` and
-  `/audit` returned 200.
-- DNS: a proxied Cloudflare A record pointing `modeq` at the server.
+Self-hosted rather than on a third-party platform: a production `next build` served by
+`next start` under PM2, behind a Caddy reverse proxy that terminates TLS. The app reads
+and writes the studionet contract listed above.

@@ -1,108 +1,199 @@
-# Modeq
+<p align="center">
+  <img src="frontend/public/logo.svg" alt="Modeq" height="72">
+</p>
 
-A transparent, consensus-verified content moderation registry built on **GenLayer
-Intelligent Contracts**.
+<h1 align="center">Modeq</h1>
 
-> **Status:** MVP live on studionet and both GenLayer testnets (Asimov, Bradbury). Text
-> moderation only for now - see [Roadmap](#roadmap).
->
-> **Live demo:** [modeq.unitynodes.com](https://modeq.unitynodes.com)
+<p align="center">
+  <b>Content moderation you can audit.</b><br>
+  A public, consensus-verified moderation registry built on GenLayer Intelligent Contracts.
+</p>
 
-## Why this exists
+<p align="center">
+  <a href="https://modeq.unitynodes.com">Live demo</a> &nbsp;|&nbsp;
+  <a href="https://modeq.unitynodes.com/audit">Public audit log</a> &nbsp;|&nbsp;
+  <a href="deploy/NOTES.md">Deployment evidence</a> &nbsp;|&nbsp;
+  <a href="#roadmap">Roadmap</a>
+</p>
 
-Content moderation today is almost always a single company's black box: one backend, one
-model, one unaccountable decision, no visible trail. Modeq moves the decision itself onto
-GenLayer:
+<p align="center">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f7cec">
+  <img alt="GenLayer Intelligent Contract" src="https://img.shields.io/badge/GenLayer-Intelligent%20Contract-18dcd4">
+  <img alt="Networks" src="https://img.shields.io/badge/networks-studionet%20%C2%B7%20Asimov%20%C2%B7%20Bradbury-0e0e10">
+  <img alt="Direct tests" src="https://img.shields.io/badge/direct%20tests-8%20passing-34d399">
+</p>
 
-- Every submission is classified by an LLM running independently on **multiple
-  validators**, and the result only lands on-chain if it survives GenLayer's
-  equivalence-principle consensus (a custom `run_nondet_unsafe` validator that reruns the
-  classification and compares the decision-relevant fields, not a byte-exact match) - no
-  single node's opinion is enough.
-- The model is **not trusted with the final call**. It only returns a structured
-  classification (categories + confidence); a small piece of deterministic Python code
-  in the contract turns that into ALLOW / FLAG / BLOCK. A model can misclassify content,
-  but it cannot talk its way past the threshold logic with a clever free-text answer.
-- Every case and verdict is stored on-chain and publicly listable
-  (`list_cases`/`get_case`) - a small forum, DAO, or community can point to an
-  append-only, third-party-auditable moderation log instead of "trust us."
+<p align="center">
+  <img src="docs/screenshots/landing.png" alt="Modeq landing page with a live audit-log preview" width="900">
+</p>
 
-## Contract - `contracts/moderation_registry.py`
+## The problem
 
+When a post is removed, you usually cannot see who decided, why, or whether anyone could
+check it. Moderation today is one company's backend, one model and one unaccountable
+decision, with no trail a third party can verify.
+
+## What Modeq does
+
+Modeq moves the decision itself onto GenLayer and makes the result public.
+
+1. **Independent classification.** A submission is classified by an LLM that runs
+   independently on several GenLayer validators. The result only lands on-chain if the
+   validators agree on the decision-relevant fields.
+2. **The model never gets the final call.** It returns a structured classification
+   (categories plus a confidence score). Fixed thresholds written in the contract turn
+   that into ALLOW, FLAG or BLOCK. A model can misclassify, but it cannot talk its way
+   past the threshold logic with a clever free-text answer.
+3. **A permanent public record.** Every case is stored on-chain and listable by anyone,
+   with no wallet, account or rate limit. A forum or DAO can point at an append-only
+   moderation log instead of saying "trust us".
+
+```mermaid
+flowchart LR
+    A["Submitter<br/>submit_content(text)"] --> B["Leader validator<br/>LLM classifies"]
+    B --> C{"Validators re-run<br/>the classification"}
+    C -- "decision and primary_category match" --> D["Case written on-chain<br/>status ACCEPTED"]
+    C -- "disagreement" --> E["No consensus<br/>nothing is stored"]
+    D --> F["Public audit log<br/>list_cases / get_case"]
 ```
-submit_content(text) -> case_id      # classify + store a new case
-get_case(case_id) -> dict            # one case: text, categories, confidence, decision, timestamp
-list_cases(offset, limit) -> list    # paginated audit log
-total_cases() -> int
-```
 
-`submit_content` asks the model for strict JSON
-(`{"categories": [...], "primary_category": ..., "max_confidence": "0.xx"}`) against a
-fixed category allow-list, validates the shape and values in Python (raises on anything
-malformed or out of range), then computes the decision deterministically:
+### How the verdict is decided
 
-- `primary_category == "none"` -> **ALLOW**
-- confidence > 70% -> **BLOCK**
-- confidence > 40% -> **FLAG**
-- otherwise -> **ALLOW**
+The thresholds are constants in the contract, not model output.
 
-Runtime pin: `# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }`.
+| Condition | Verdict |
+|---|---|
+| `primary_category` is `none` | **ALLOW** |
+| confidence above 70% | **BLOCK** |
+| confidence above 40% | **FLAG** |
+| otherwise | **ALLOW** |
 
-## Testing
+Categories: `spam`, `hate_speech`, `harassment`, `nsfw`, `violence`, `none`.
 
-```bash
-python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-genvm-lint check contracts/moderation_registry.py
-pytest tests/direct/ -v                      # fast, in-memory, mocked LLM
-gltest --network studionet tests/integration/ -v -s   # real consensus on hosted Studio
-```
+The model's JSON is validated in Python before anything is stored. Unknown keys, a
+category outside the allow-list, or a non-numeric or out-of-range confidence raise a
+`UserError`. A leader run that fails this way is not accepted, and a validator that
+cannot reproduce valid output votes against the leader instead of storing bad data.
 
-8 Direct-mode tests cover the ALLOW/FLAG/BLOCK thresholds, the `primary_category ==
-"none"` override, rejection of malformed/out-of-allow-list model output, and that a model
-cannot smuggle its own `"decision"` field past validation. The integration test deploys
-to real GenLayer Studio, submits real content, waits for actual multi-validator
-consensus, and reads the resulting case back on-chain.
+## Screens
 
-Beyond the automated suite, four manual adversarial attacks (prompt injection,
-decision-field smuggling, delimiter injection, jailbreak framing) were submitted through
-the live production app and are still visible in the on-chain audit log - all four were
-correctly classified as spam and blocked. Details and case IDs in
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/app.png" alt="Moderation tool"></td>
+    <td width="50%"><img src="docs/screenshots/audit.png" alt="Public audit log"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>/app</b> - submit text from a wallet and watch consensus decide</td>
+    <td align="center"><b>/audit</b> - every case ever made, filterable, with the rule that fired</td>
+  </tr>
+</table>
+
+## The contract
+
+[`contracts/moderation_registry.py`](contracts/moderation_registry.py)
+
+| Method | Kind | Description |
+|---|---|---|
+| `submit_content(text)` | write | Classify and store a new case, returns its `case_id` |
+| `get_case(case_id)` | view | One case: submitter, text, categories, primary category, confidence, decision, timestamp |
+| `list_cases(offset, limit)` | view | Paginated audit log |
+| `total_cases()` | view | Number of stored cases |
+
+The consensus logic uses a custom `gl.vm.run_nondet_unsafe(leader_fn, validator_fn)` pair
+instead of `strict_eq`. LLM output is never byte-identical across validators, so the
+validator re-runs the classification and compares only `decision` and `primary_category`.
+Confidence jitter such as 97% against 99% does not break consensus. The history of that
+change, and the real bug it fixed, is in [deploy/NOTES.md](deploy/NOTES.md).
+
+## Deployments
+
+| Network | Contract | Cases |
+|---|---|---|
+| GenLayer Studio (studionet), used by the live app | `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107` | 18 (9 ALLOW, 9 BLOCK) |
+| Asimov testnet | [`0xF95A5969c79706C7f4274D4e633315bD014C56Eb`](https://explorer-asimov.genlayer.com/address/0xF95A5969c79706C7f4274D4e633315bD014C56Eb) | 1 |
+| Bradbury testnet | [`0x13bfD75B34d2C106EA472F105811194352c30461`](https://explorer-bradbury.genlayer.com/address/0x13bfD75B34d2C106EA472F105811194352c30461) | 1 |
+
+Counts are read from the chain with `total_cases()`. Reproduction steps are in
+[deploy/NOTES.md](deploy/NOTES.md).
+
+## Security testing
+
+Four manual attacks were submitted through the live app against the studionet contract,
+each trying to talk the classifier into calling obvious spam clean. All four were
+classified as spam and blocked, and they remain visible in the audit log.
+
+| Case | Attack | Result |
+|---|---|---|
+| 10 | Prompt injection | BLOCK, spam, 99% |
+| 11 | Smuggling a literal `decision: ALLOW` JSON blob | BLOCK, spam, 96% |
+| 12 | Delimiter injection that closes the `<content>` wrapper | BLOCK, spam, 95% |
+| 13 | Fake "debug mode" jailbreak | BLOCK, spam, 98% |
+
+In all four the model's own judgment held, so the strict shape validation was never
+triggered by a live model. It is verified against a mocked non-compliant response by
+`test_decision_is_computed_not_trusted_from_model`. Both layers are described honestly in
 [deploy/NOTES.md](deploy/NOTES.md#adversarial-testing-manual-red-team-live-studionet).
 
-## Deployed instances
+## Run it
 
-Full reproduction steps and live on-chain evidence (including a real bug this caught, and
-its fix) are in [deploy/NOTES.md](deploy/NOTES.md).
+### Contract
 
-| Network | Contract | Status |
-|---|---|---|
-| studionet | `0xBC9b8c99889fe33f7650FA3530387Ee931AbD107` | 1 live classified case |
-| Asimov testnet | [`0xF95A5969c79706C7f4274D4e633315bD014C56Eb`](https://explorer-asimov.genlayer.com/address/0xF95A5969c79706C7f4274D4e633315bD014C56Eb) | schema-verified, 1 live case |
-| Bradbury testnet | [`0x13bfD75B34d2C106EA472F105811194352c30461`](https://explorer-bradbury.genlayer.com/address/0x13bfD75B34d2C106EA472F105811194352c30461) | schema-verified, 1 live case |
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-## Frontend - `frontend/`
+genvm-lint check contracts/moderation_registry.py
+pytest tests/direct/ -v                                # 8 tests, in memory, mocked LLM
+gltest --network studionet tests/integration/ -v -s    # real consensus on GenLayer Studio
+```
 
-A Next.js app: a marketing landing page (`/`), the wallet-connected moderation tool
-(`/app`), and a public audit-log page (`/audit`) that lists every case with no wallet
-required (the actual transparency pitch). See [frontend/README.md](frontend/README.md).
+The direct tests cover the three thresholds, the `none` override, rejection of malformed
+output and unknown categories, a model trying to smuggle its own `decision` field, and
+the listing methods. `genvm-lint` reports one expected warning: `time.time()` is called
+inside the non-deterministic leader function on purpose, to stamp each case.
+
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build
+```
+
+Connect MetaMask on `/app`. The app switches the wallet to the GenLayer network before
+every write, and does not rely on the client library for that check. Details are in
+[frontend/README.md](frontend/README.md).
+
+## Repository layout
+
+```
+contracts/            Intelligent Contract (Python)
+tests/direct/         fast in-memory tests with a mocked LLM
+tests/integration/    end-to-end test against GenLayer Studio
+deploy/NOTES.md       deployment steps, on-chain evidence, bugs found and fixed
+frontend/             Next.js 16 app: landing, /app tool, /audit log
+docs/screenshots/     images used in this README
+```
 
 ## Roadmap
 
-- **Multimodal moderation** (planned next Milestone): accept an image alongside/instead
-  of text, using `gl.nondet.exec_prompt(images=[...])`, and extend the category schema
-  accordingly.
+- **Multimodal moderation**: accept an image alongside or instead of text through
+  `gl.nondet.exec_prompt(images=[...])`, and extend the category schema.
 - Per-community configurable thresholds and category sets.
 - An appeal flow that re-runs classification with the submitter's counter-argument
   attached, under a second independent consensus round.
 
-## Built on
+## Built with
 
-The official GenLayer toolchain: [`genlayer-py`](https://github.com/genlayerlabs/genlayer-py),
-[`genlayer-testing-suite`](https://github.com/genlayerlabs/genlayer-testing-suite) (gltest),
-[`genvm-linter`](https://github.com/genlayerlabs/genvm-linter),
-[`genlayer-js`](https://github.com/genlayerlabs/genlayer-js), and patterns from the
-[`genlayer-project-boilerplate`](https://github.com/genlayerlabs/genlayer-project-boilerplate).
+[GenLayer](https://www.genlayer.com) Intelligent Contracts and the official toolchain:
+[`genlayer-py`](https://github.com/genlayerlabs/genlayer-py),
+[`genlayer-testing-suite`](https://github.com/genlayerlabs/genlayer-testing-suite),
+[`genvm-linter`](https://github.com/genlayerlabs/genvm-linter) and
+[`genlayer-js`](https://github.com/genlayerlabs/genlayer-js). The frontend is Next.js 16,
+React 19, Framer Motion and plain CSS design tokens.
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

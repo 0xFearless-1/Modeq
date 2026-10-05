@@ -22,4 +22,8 @@
 
 ## Underlying technology
 
-Built on GenLayer Intelligent Contracts (Python, GenVM runtime) using the equivalence-principle consensus primitive (`gl.eq_principle.strict_eq`) so that a verdict only lands on-chain once independent validators agree. Frontend is a Next.js app talking to the contract via genlayer-js.
+Built on GenLayer Intelligent Contracts (Python, GenVM runtime). Consensus uses a custom `gl.vm.run_nondet_unsafe` leader and validator pair: each validator re-runs the classification independently and a verdict is written on-chain only when the validators agree on the decision and the primary category. The frontend is a Next.js app talking to the contract through genlayer-js.
+
+## Source
+
+https://github.com/UnityNodes/Modeq
