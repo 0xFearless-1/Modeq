@@ -345,8 +345,9 @@ export default function AuditLogPage() {
                               <div className="audit-detail-label">Why this verdict</div>
                               <p className="audit-trace-line">{thresholdTrace(c)}</p>
                               <p className="audit-trace-line">
-                                Confirmed by 5 independent GenLayer validators - this case
-                                could not have reached ACCEPTED otherwise.
+                                Accepted by a majority of 5 independent GenLayer
+                                validators - this case could not have reached ACCEPTED
+                                otherwise.
                               </p>
                             </div>
                             <div>

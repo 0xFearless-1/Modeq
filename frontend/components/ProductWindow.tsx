@@ -100,7 +100,7 @@ export function ProductWindow({ cases }: { cases: Case[] }) {
         </div>
         <div className="product-window-foot">
           <ShieldCheck size={13} strokeWidth={1.75} aria-hidden="true" />
-          Every verdict confirmed by 5 validators
+          Every verdict accepted by a validator majority
         </div>
       </div>
     </motion.div>

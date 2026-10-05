@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 const SITE_URL = "https://modeq.unitynodes.com";
 const TITLE = "Modeq - consensus-verified content moderation";
 const DESCRIPTION =
-  "Modeq classifies content with an LLM running independently on five GenLayer validators. A deterministic threshold - not the model - decides ALLOW, FLAG, or BLOCK, and every case is written to a public on-chain audit log.";
+  "Modeq classifies content with an LLM running independently on five GenLayer validators and accepts a verdict only when a majority agrees. A deterministic threshold - not the model - decides ALLOW, FLAG, or BLOCK, and every case is written to a public on-chain audit log.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

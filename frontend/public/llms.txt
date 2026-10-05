@@ -1,6 +1,6 @@
 # Modeq
 
-> Modeq is a transparent, consensus-verified content moderation registry built on GenLayer Intelligent Contracts. Instead of a single company's model deciding what gets moderated, five GenLayer validators independently classify each submission; a deterministic threshold - not the model - turns that classification into ALLOW, FLAG, or BLOCK, and every case is written to a public, on-chain audit log.
+> Modeq is a transparent, consensus-verified content moderation registry built on GenLayer Intelligent Contracts. Instead of a single company's model deciding what gets moderated, five GenLayer validators independently classify each submission and a majority must agree; a deterministic threshold - not the model - turns that classification into ALLOW, FLAG, or BLOCK, and every case is written to a public, on-chain audit log.
 
 ## What it does
 

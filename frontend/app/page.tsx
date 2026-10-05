@@ -94,9 +94,9 @@ export default function LandingPage() {
               transition={{ duration: 0.7, delay: 0.14, ease: EASE }}
             >
               Modeq replaces that with a public registry. Five independent GenLayer
-              validators classify every piece of content, fixed thresholds - not a
-              model&rsquo;s opinion - decide the outcome, and every case stays on-chain
-              and checkable by anyone, forever.
+              validators classify every piece of content and a majority must agree. Fixed
+              thresholds - not a model&rsquo;s opinion - decide the outcome, and every
+              case stays on-chain and checkable by anyone, forever.
             </motion.p>
 
             <motion.div
@@ -239,9 +239,10 @@ export default function LandingPage() {
                 <div className="feature-copy">
                   <h3>No independent check</h3>
                   <p>
-                    Modeq needs 5 separate validators to independently reach the same
-                    verdict before anything counts. One manipulated or hallucinating model
-                    can&rsquo;t decide alone - it just gets outvoted.
+                    Modeq runs the classification on 5 separate validators, and a majority
+                    must independently reach the same verdict before anything counts. One
+                    manipulated or hallucinating model can&rsquo;t decide alone - it just
+                    gets outvoted.
                   </p>
                 </div>
               </div>
@@ -326,7 +327,8 @@ export default function LandingPage() {
                       strokeWidth={2}
                       aria-hidden="true"
                     />
-                    5 validators classify independently before anything is accepted
+                    5 validators classify independently and a majority must agree before
+                    anything is accepted
                   </li>
                   <li>
                     <Check
