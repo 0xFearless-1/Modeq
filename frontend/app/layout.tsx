@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
+import { Providers } from "@/components/Providers";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteNav } from "@/components/SiteNav";
 import "./globals.css";
 
 const body = Instrument_Sans({
@@ -16,6 +16,11 @@ const mono = JetBrains_Mono({
   variable: "--font-mono",
   weight: ["400", "500", "700"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#0e0e10",
+  colorScheme: "dark",
+};
 
 const SITE_URL = "https://modeq.unitynodes.com";
 const TITLE = "Modeq - consensus-verified content moderation";
@@ -75,29 +80,16 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <div className="navbar">
-          <div className="navbar-inner">
-            <Link className="brand" href="/">
-              <Image
-                className="brand-mark"
-                src="/logo.svg"
-                alt=""
-                width={47}
-                height={32}
-                priority
-              />
-              Modeq
-            </Link>
-            <div className="nav-links">
-              <Link href="/audit">Audit log</Link>
-              <Link className="btn btn-primary" href="/app">
-                Launch app
-              </Link>
-            </div>
-          </div>
-        </div>
-        <div className="shell">{children}</div>
-        <SiteFooter />
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <Providers>
+          <SiteNav />
+          <main id="main" className="shell">
+            {children}
+          </main>
+          <SiteFooter />
+        </Providers>
       </body>
     </html>
   );

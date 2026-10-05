@@ -7,16 +7,16 @@ export function SiteFooter() {
       <div>
         <div className="brand">
           <Image src="/logo.svg" alt="" width={47} height={32} className="brand-mark" />
-          Modeq
+          <span translate="no">Modeq</span>
         </div>
         <p className="site-footer-blurb">
-          A transparent, consensus-verified content moderation registry built on
-          GenLayer Intelligent Contracts.
+          A transparent, consensus-verified content moderation registry built on GenLayer
+          Intelligent Contracts.
         </p>
       </div>
 
       <div>
-        <h4>Product</h4>
+        <h2>Product</h2>
         <ul>
           <li>
             <Link href="/app">Launch app</Link>
@@ -28,7 +28,7 @@ export function SiteFooter() {
       </div>
 
       <div>
-        <h4>Networks</h4>
+        <h2>Networks</h2>
         <ul>
           <li>GenLayer Studio</li>
           <li>Asimov testnet</li>

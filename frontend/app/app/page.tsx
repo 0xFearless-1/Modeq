@@ -3,8 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, Send, CheckCircle2, AlertTriangle, XCircle, ShieldCheck } from "lucide-react";
-import { connectMetaMask, formatAddress, getAuthorizedAccount } from "@/lib/genlayer/wallet";
+import {
+  Wallet,
+  Send,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ShieldCheck,
+} from "lucide-react";
+import {
+  connectMetaMask,
+  formatAddress,
+  getAuthorizedAccount,
+} from "@/lib/genlayer/wallet";
 import { getCase, submitContent, totalCases, type Case } from "@/lib/contract";
 import { ValidatorPulse } from "@/components/ValidatorPulse";
 import { Stepper } from "@/components/Stepper";
@@ -30,7 +41,8 @@ const CRITERIA: { key: CategoryKey; desc: string }[] = [
 const RESULT_MEANING = {
   ALLOW: "Your post stays visible in the community feed, right away.",
   FLAG: "Your post stays visible, but is marked for review in the community feed.",
-  BLOCK: "Your post is hidden from the community feed. The decision itself is still public - anyone can audit it.",
+  BLOCK:
+    "Your post is hidden from the community feed. The decision itself is still public - anyone can audit it.",
 };
 
 const MAX_LEN = 500;
@@ -103,158 +115,184 @@ export default function AppPage() {
   return (
     <>
       <div className="app-header">
+        <span className="eyebrow">Live demo</span>
         <h1>Post to the community feed</h1>
         <p>
           Write a forum comment, a DAO chat message, a support reply - anything a
-          community would post. It's classified by an LLM running independently on
+          community would post. It&rsquo;s classified by an LLM running independently on
           multiple GenLayer validators, then a fixed set of deterministic rules decides
           ALLOW, FLAG, or BLOCK - never the model itself.
         </p>
       </div>
 
       <div className="app-layout">
-        <div>
+        <div className="app-main">
           <Stepper current={step} />
 
           <motion.div
-            className="panel compose-panel"
-            style={{ marginTop: 0 }}
+            className="bezel"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
           >
-            <div className="compose-head">
-              <span className="compose-node" />
-              Next block - unconfirmed
-            </div>
+            <div className="bezel-core compose-panel">
+              <div className="compose-head">
+                <span className="compose-node" />
+                Next block - unconfirmed
+              </div>
 
-            <div className="row" style={{ marginTop: 0 }}>
-              {account ? (
-                <span className="wallet-chip">
-                  <Wallet size={14} strokeWidth={1.8} />
-                  {formatAddress(account)}
-                </span>
-              ) : (
-                <button className="btn btn-primary" onClick={handleConnect}>
-                  <Wallet size={15} strokeWidth={2} />
-                  Connect wallet
-                </button>
-              )}
-            </div>
+              <div className="row" style={{ marginTop: 0 }}>
+                {account ? (
+                  <span className="wallet-chip">
+                    <Wallet size={14} strokeWidth={1.75} aria-hidden="true" />
+                    {formatAddress(account)}
+                  </span>
+                ) : (
+                  <button className="btn btn-primary" onClick={handleConnect}>
+                    <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
+                    Connect wallet
+                  </button>
+                )}
+              </div>
 
-            <div className="example-row">
-              <span className="example-label">Try:</span>
-              {EXAMPLES.map((ex) => (
-                <button
-                  key={ex.label}
-                  type="button"
-                  className="example-chip"
-                  onClick={() => setText(ex.text)}
+              <div className="example-row">
+                <span className="example-label">Try:</span>
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex.label}
+                    type="button"
+                    className="example-chip"
+                    onClick={() => setText(ex.text)}
+                    disabled={!account || busy}
+                  >
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ marginTop: "0.9rem" }}>
+                <label className="sr-only" htmlFor="content">
+                  Content to moderate
+                </label>
+                <textarea
+                  id="content"
+                  name="content"
+                  autoComplete="off"
+                  placeholder="Write a forum comment, a DAO chat message, a support reply…"
+                  value={text}
+                  maxLength={MAX_LEN}
+                  onChange={(e) => setText(e.target.value)}
                   disabled={!account || busy}
-                >
-                  {ex.label}
-                </button>
-              ))}
-            </div>
+                />
+                <div className="char-count">
+                  {text.length}/{MAX_LEN}
+                </div>
+              </div>
 
-            <div style={{ marginTop: "0.75rem" }}>
-              <textarea
-                placeholder="Write a forum comment, a DAO chat message, a support reply..."
-                value={text}
-                maxLength={MAX_LEN}
-                onChange={(e) => setText(e.target.value)}
-                disabled={!account || busy}
-              />
-              <div className="char-count">
-                {text.length}/{MAX_LEN}
+              <div className="row">
+                <button
+                  className="btn btn-primary btn-arrow"
+                  onClick={handleSubmit}
+                  disabled={!account || !text.trim() || busy}
+                >
+                  {busy ? "Posting…" : "Post to feed"}
+                  <span className="btn-arrow-icon" aria-hidden="true">
+                    <Send size={15} strokeWidth={1.75} />
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {busy && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <ValidatorPulse />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {error && (
+                <motion.p
+                  className="error"
+                  role="alert"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {error}
+                </motion.p>
+              )}
+
+              <div aria-live="polite">
+                <AnimatePresence>
+                  {result && ResultIcon && (
+                    <motion.div
+                      className={`result-card ${result.decision}`}
+                      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+                    >
+                      <div className="result-head">
+                        <span className="result-icon-wrap">
+                          {result.decision === "ALLOW" && (
+                            <motion.span
+                              className="icon-ping"
+                              initial={{ scale: 0.6, opacity: 0.55 }}
+                              animate={{ scale: 2.4, opacity: 0 }}
+                              transition={{ duration: 0.9, ease: "easeOut" }}
+                            />
+                          )}
+                          <ResultIcon
+                            size={18}
+                            strokeWidth={1.75}
+                            aria-hidden="true"
+                            color={`var(--${result.decision.toLowerCase()})`}
+                          />
+                        </span>
+                        <span className={`badge ${result.decision}`}>
+                          {result.decision}
+                        </span>
+                        {result.primary_category !== "none" &&
+                          resultCategoryMeta &&
+                          ResultCategoryIcon && (
+                            <span
+                              className={`category-chip inline ${result.primary_category}`}
+                            >
+                              <ResultCategoryIcon
+                                size={13}
+                                strokeWidth={1.75}
+                                aria-hidden="true"
+                              />
+                              {resultCategoryMeta.label}
+                            </span>
+                          )}
+                        <span className="muted">
+                          {(result.confidence_bps / 100).toFixed(0)}% confidence
+                        </span>
+                        <span
+                          className={`consensus-dots ${result.decision}`}
+                          title="Confirmed by 5 independent GenLayer validators"
+                        >
+                          <ShieldCheck size={12} strokeWidth={1.75} aria-hidden="true" />
+                          {Array.from({ length: 5 }).map((_, d) => (
+                            <i key={d} className="consensus-dot" />
+                          ))}
+                        </span>
+                      </div>
+                      <p className="result-text">{result.text}</p>
+                      <p className="result-meaning">{RESULT_MEANING[result.decision]}</p>
+                      <Link href="/audit" className="result-feed-link">
+                        See it in the community feed →
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
-
-            <div className="row">
-              <button
-                className="btn btn-accent"
-                onClick={handleSubmit}
-                disabled={!account || !text.trim() || busy}
-              >
-                <Send size={15} strokeWidth={2} />
-                Post to feed
-              </button>
-              <AnimatePresence>
-                {busy && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <ValidatorPulse />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {error && (
-              <motion.p
-                className="error"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {error}
-              </motion.p>
-            )}
-
-            <AnimatePresence>
-              {result && ResultIcon && (
-                <motion.div
-                  className={`result-card ${result.decision}`}
-                  initial={{ opacity: 0, y: 12, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
-                >
-                  <div className="result-head">
-                    <span className="result-icon-wrap">
-                      {result.decision === "ALLOW" && (
-                        <motion.span
-                          className="icon-ping"
-                          initial={{ scale: 0.6, opacity: 0.55 }}
-                          animate={{ scale: 2.4, opacity: 0 }}
-                          transition={{ duration: 0.9, ease: "easeOut" }}
-                        />
-                      )}
-                      <ResultIcon
-                        size={18}
-                        strokeWidth={2}
-                        color={`var(--${result.decision.toLowerCase()})`}
-                      />
-                    </span>
-                    <span className={`badge ${result.decision}`}>{result.decision}</span>
-                    {result.primary_category !== "none" && resultCategoryMeta && ResultCategoryIcon && (
-                      <span className={`category-chip inline ${result.primary_category}`}>
-                        <ResultCategoryIcon size={13} strokeWidth={2} />
-                        {resultCategoryMeta.label}
-                      </span>
-                    )}
-                    <span className="muted">
-                      {(result.confidence_bps / 100).toFixed(0)}% confidence
-                    </span>
-                    <span
-                      className={`consensus-dots ${result.decision}`}
-                      title="Confirmed by 5 independent GenLayer validators"
-                    >
-                      <ShieldCheck size={12} strokeWidth={2} />
-                      {Array.from({ length: 5 }).map((_, d) => (
-                        <i key={d} className="consensus-dot" />
-                      ))}
-                    </span>
-                  </div>
-                  <p className="result-text">{result.text}</p>
-                  <p className="result-meaning">{RESULT_MEANING[result.decision]}</p>
-                  <Link href="/audit" className="result-feed-link">
-                    See it in the community feed →
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
+
+          <RecentFeed />
         </div>
 
         <aside className="app-aside">
@@ -264,7 +302,7 @@ export default function AppPage() {
               const meta = CATEGORY_META[c.key];
               return (
                 <div key={c.key} className="aside-criteria-row" title={c.desc}>
-                  <meta.icon size={14} strokeWidth={2} />
+                  <meta.icon size={15} strokeWidth={1.75} aria-hidden="true" />
                   <span>{meta.label}</span>
                 </div>
               );
@@ -290,8 +328,6 @@ export default function AppPage() {
               vote on the outcome.
             </p>
           </div>
-
-          <RecentFeed />
         </aside>
       </div>
     </>

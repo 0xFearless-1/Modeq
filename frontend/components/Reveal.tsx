@@ -3,9 +3,11 @@
 import { motion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
+const EASE = [0.23, 1, 0.32, 1] as const;
+
 const variants: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)" },
 };
 
 export function Reveal({
@@ -24,9 +26,9 @@ export function Reveal({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, amount: 0.3 }}
+      viewport={{ once, amount: 0.15 }}
       variants={variants}
-      transition={{ duration: 0.6, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+      transition={{ duration: 0.7, delay, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -36,7 +38,7 @@ export function Reveal({
 export function RevealGroup({
   children,
   className,
-  stagger = 0.1,
+  stagger = 0.08,
 }: {
   children: ReactNode;
   className?: string;
@@ -47,7 +49,7 @@ export function RevealGroup({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.15 }}
       transition={{ staggerChildren: stagger }}
     >
       {children}
@@ -66,7 +68,7 @@ export function RevealItem({
     <motion.div
       className={className}
       variants={variants}
-      transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      transition={{ duration: 0.6, ease: EASE }}
     >
       {children}
     </motion.div>
