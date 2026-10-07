@@ -37,9 +37,13 @@ skips its own chain check for Studio-based chains.
 ## Wallet notes
 
 The network is free: `eth_gasPrice` on Studio returns `0x0`, and a brand-new account with no
-balance can submit. Some wallets treat a zero fee as "not set" and disable Approve. In
-that case enter any small custom fee, for example 1 gwei. Studio accepts it without
-charging, and the app shows this hint while it waits for the signature.
+balance can submit from a wallet that does not check balances (MetaMask). Some wallets treat
+a zero fee as "not set" and disable Approve. In that case enter any small custom fee, for
+example 1 gwei. Wallets that also check the balance (Keplr, for one) then report
+"Insufficient balance": press **Get free test GEN** on `/app`, which calls Studio's
+`sim_fundAccount` for the connected account. The address must be EIP-55 checksummed or
+Studio credits nothing silently, so the app checksums it first. The app shows these hints
+while it waits for the signature.
 
 ## Transaction lifecycle
 

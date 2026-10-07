@@ -26,7 +26,7 @@ export function RecentFeed() {
         const all = await listCases(0, 100);
         if (!cancelled) setCases(all.slice(-5).reverse());
       } catch {
-        if (!cancelled) setCases([]);
+        return;
       }
     }
 

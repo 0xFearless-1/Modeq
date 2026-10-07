@@ -75,6 +75,7 @@ export default function AuditLogPage() {
         const all = await listCases(0, 100);
         if (cancelled) return;
         setCases(all.slice().reverse());
+        setError(null);
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : String(err));
       } finally {

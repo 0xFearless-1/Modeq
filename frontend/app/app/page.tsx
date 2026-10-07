@@ -11,6 +11,9 @@ import {
   XCircle,
   ShieldCheck,
 } from "lucide-react";
+import { getAddress } from "viem";
+import { getStudioUrl } from "@/lib/genlayer/client";
+import { formatGen, requestTestGen } from "@/lib/faucet";
 import {
   connectMetaMask,
   formatAddress,
@@ -74,6 +77,10 @@ export default function AppPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Case | null>(null);
   const [tx, setTx] = useState<TxState>(IDLE_TX);
+  const [faucet, setFaucet] = useState<{
+    state: "idle" | "busy" | "done" | "error";
+    note: string;
+  }>({ state: "idle", note: "" });
 
   useEffect(() => {
     getAuthorizedAccount().then((address) => {
@@ -88,6 +95,17 @@ export default function AppPage() {
       setAccount(address);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  async function handleFund() {
+    if (!account) return;
+    setFaucet({ state: "busy", note: "" });
+    try {
+      const balance = await requestTestGen(getStudioUrl(), getAddress(account));
+      setFaucet({ state: "done", note: `Balance: ${formatGen(balance)} GEN` });
+    } catch (err) {
+      setFaucet({ state: "error", note: describeFailure(err).message });
     }
   }
 
@@ -157,10 +175,25 @@ export default function AppPage() {
 
               <div className="row" style={{ marginTop: 0 }}>
                 {account ? (
-                  <span className="wallet-chip">
-                    <Wallet size={14} strokeWidth={1.75} aria-hidden="true" />
-                    {formatAddress(account)}
-                  </span>
+                  <>
+                    <span className="wallet-chip">
+                      <Wallet size={14} strokeWidth={1.75} aria-hidden="true" />
+                      {formatAddress(account)}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={handleFund}
+                      disabled={faucet.state === "busy" || busy}
+                    >
+                      {faucet.state === "busy" ? "Adding test GEN…" : "Get free test GEN"}
+                    </button>
+                    {faucet.note && (
+                      <span className={`faucet-note ${faucet.state}`} role="status">
+                        {faucet.note}
+                      </span>
+                    )}
+                  </>
                 ) : (
                   <button className="btn btn-primary" onClick={handleConnect}>
                     <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
