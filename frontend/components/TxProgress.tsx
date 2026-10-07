@@ -143,6 +143,13 @@ export function TxProgress({ tx, caseId }: { tx: TxState; caseId: number | null 
           <div className="tx-body">
             <div className="tx-title">Confirm in your wallet</div>
             <div className="tx-detail">{walletDetail}</div>
+            {tx.phase === "signing" && (
+              <p className="tx-hint">
+                Wallet says &ldquo;Fee is not set&rdquo; and Approve is disabled? Open the
+                fee settings and enter any small custom fee, for example 1 gwei. Studio is
+                a free test network: nothing is charged and no funds are needed.
+              </p>
+            )}
           </div>
         </li>
 

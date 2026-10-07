@@ -2476,6 +2476,17 @@ textarea:disabled {
   color: var(--dim);
 }
 
+.tx-hint {
+  margin: 0.55rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: var(--shell-bg);
+  border: 1px solid var(--hairline);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .tx-hash {
   font-family: var(--font-mono);
   font-size: 0.8rem;

@@ -175,7 +175,10 @@ npm test           # transaction tracker tests
 ```
 
 Connect MetaMask on `/app`. The app switches the wallet to the GenLayer network before
-every write, and does not rely on the client library for that check. Details are in
+every write, and does not rely on the client library for that check. No funds are needed:
+Studio is a free test network, and a brand-new empty account can submit. If a wallet shows
+"Fee is not set" and keeps Approve disabled, open its fee settings and enter any small
+custom fee such as 1 gwei; nothing is charged. Details are in
 [frontend/README.md](frontend/README.md).
 
 ## Repository layout

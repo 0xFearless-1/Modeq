@@ -34,6 +34,13 @@ MetaMask has to be on the GenLayer network to sign `submit_content`. The app che
 needed) at connect time and again right before every write, because the client library
 skips its own chain check for Studio-based chains.
 
+## Wallet notes
+
+The network is free: `eth_gasPrice` on Studio returns `0x0`, and a brand-new account with no
+balance can submit. Some wallets treat a zero fee as "not set" and disable Approve. In
+that case enter any small custom fee, for example 1 gwei. Studio accepts it without
+charging, and the app shows this hint while it waits for the signature.
+
 ## Transaction lifecycle
 
 `/app` shows every stage of a write instead of a spinner:
