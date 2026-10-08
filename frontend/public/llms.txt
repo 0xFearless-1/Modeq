@@ -27,4 +27,4 @@ Built on GenLayer Intelligent Contracts (Python, GenVM runtime). Consensus uses 
 
 ## Source
 
-https://github.com/UnityNodes/Modeq
+https://github.com/0xFearless-1/Modeq

@@ -36,7 +36,7 @@ const DOORS = [
     external: false,
   },
   {
-    href: "https://github.com/UnityNodes/Modeq/blob/main/contracts/moderation_registry.py",
+    href: "https://github.com/0xFearless-1/Modeq/blob/main/contracts/moderation_registry.py",
     title: "Read the contract",
     text: "157 lines of Python: the thresholds, the output validation and the consensus pair. Live on Studio, Asimov and Bradbury.",
     external: true,
