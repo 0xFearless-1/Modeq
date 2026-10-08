@@ -24,6 +24,13 @@ export function SiteNav() {
         </Link>
         <div className="nav-links">
           <Link
+            className="nav-demo"
+            href="/demo"
+            aria-current={pathname.startsWith("/demo") ? "page" : undefined}
+          >
+            Demo
+          </Link>
+          <Link
             href="/audit"
             aria-current={pathname.startsWith("/audit") ? "page" : undefined}
           >

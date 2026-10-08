@@ -7,6 +7,7 @@ A Next.js 16 app (App Router, React 19) with three routes:
 | `/` | Landing page: live registry numbers, the case for consensus, how a verdict is made | no |
 | `/app` | Connect MetaMask, submit text, see the ALLOW / FLAG / BLOCK verdict once GenLayer consensus finalizes it | yes |
 | `/audit` | Public audit log from `list_cases`: filters, per-case threshold trace, deep links | no |
+| `/demo` | 77-second narrated walkthrough hosted on the same origin, with chapters, captions and download | no |
 
 ## Run
 

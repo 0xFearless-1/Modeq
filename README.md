@@ -10,7 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://modeq.unitynodes.com">Live demo</a> &nbsp;|&nbsp;
+  <a href="https://modeq.unitynodes.com">Live app</a> &nbsp;|&nbsp;
+  <a href="https://modeq.unitynodes.com/demo">77-second demo</a> &nbsp;|&nbsp;
   <a href="https://modeq.unitynodes.com/audit">Public audit log</a> &nbsp;|&nbsp;
   <a href="deploy/NOTES.md">Deployment evidence</a> &nbsp;|&nbsp;
   <a href="#roadmap">Roadmap</a>

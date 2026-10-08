@@ -22,6 +22,9 @@ export function SiteFooter() {
             <Link href="/app">Launch app</Link>
           </li>
           <li>
+            <Link href="/demo">Demo</Link>
+          </li>
+          <li>
             <Link href="/audit">Audit log</Link>
           </li>
         </ul>

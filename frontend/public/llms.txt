@@ -13,6 +13,7 @@
 - / - product landing page and explanation of the consensus mechanism
 - /app - submit text for moderation (requires a MetaMask-compatible wallet on GenLayer)
 - /audit - public, read-only audit log of every case ever submitted
+- /demo - 77-second narrated walkthrough of the live app, with chapters and captions
 
 ## Live deployments
 

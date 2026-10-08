@@ -1,0 +1,50 @@
+WEBVTT
+
+1
+00:00:00.500 --> 00:00:08.483
+When a post is removed, you usually cannot see who
+decided, why, or check it. Modeq makes moderation a public
+record.
+
+2
+00:00:09.383 --> 00:00:20.842
+Five GenLayer validators classify each submission, and a
+majority has to agree. Fixed thresholds in the contract,
+not the model, decide allow, flag or block.
+
+3
+00:00:22.342 --> 00:00:33.300
+This is the public audit log: every decision Modeq has
+made, readable without a wallet. Open any case to see the
+exact rule that produced the verdict.
+
+4
+00:00:34.100 --> 00:00:37.467
+To try it, open the app and connect a wallet.
+
+5
+00:00:38.267 --> 00:00:41.633
+Pick an example, here a spam message, and post it.
+
+6
+00:00:42.533 --> 00:00:52.950
+Now the app follows the transaction: your wallet signs it,
+it goes to GenLayer with a link to the explorer, and the
+validators vote, usually in about fifteen seconds.
+
+7
+00:00:54.050 --> 00:01:02.833
+The verdict is block, for spam, with the confidence and
+how many validators agreed. Fixed thresholds made that
+call, not the model.
+
+8
+00:01:03.833 --> 00:01:10.767
+The case is now in the public log, with the rule that
+fired. It cannot be edited or removed.
+
+9
+00:01:11.900 --> 00:01:16.509
+Modeq. Content moderation you can audit, built on
+GenLayer.
+
