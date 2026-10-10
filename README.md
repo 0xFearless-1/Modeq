@@ -146,6 +146,9 @@ triggered by a live model. It is verified against a mocked non-compliant respons
 `test_decision_is_computed_not_trusted_from_model`. Both layers are described honestly in
 [deploy/NOTES.md](deploy/NOTES.md#adversarial-testing-manual-red-team-live-studionet).
 
+What the validators attest, what they do not, and where the workflow is still limited are
+written down in [docs/TRUST_MODEL.md](docs/TRUST_MODEL.md).
+
 ## Run it
 
 ### Contract
@@ -189,6 +192,7 @@ tests/direct/         fast in-memory tests with a mocked LLM
 tests/integration/    end-to-end test against GenLayer Studio
 deploy/NOTES.md       deployment steps, on-chain evidence, bugs found and fixed
 frontend/             Next.js 16 app: landing, /app tool, /audit log
+docs/TRUST_MODEL.md    what validators attest and the known limits
 docs/screenshots/     images used in this README
 ```
 
