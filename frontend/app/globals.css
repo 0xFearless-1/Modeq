@@ -2883,3 +2883,25 @@ textarea:disabled {
 .nowrap {
   white-space: nowrap;
 }
+
+.demo-note {
+  margin: 0.7rem 0 0;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: var(--shell-bg);
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.audit-snapshot {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--flag-tint);
+  border-radius: var(--radius-sm);
+  background: var(--flag-tint);
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+

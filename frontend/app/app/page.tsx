@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   XCircle,
   ShieldCheck,
+  Play,
 } from "lucide-react";
 import { getAddress } from "viem";
 import { getStudioUrl } from "@/lib/genlayer/client";
@@ -19,7 +20,8 @@ import {
   formatAddress,
   getAuthorizedAccount,
 } from "@/lib/genlayer/wallet";
-import { findCaseSince, submitContent, type Case } from "@/lib/contract";
+import { findCaseSince, submitContent, submitViaRelay, type Case } from "@/lib/contract";
+import { loadRelayInfo, type RelayInfo } from "@/lib/relay";
 import { IDLE_TX, TxError, describeFailure, type TxState, type TxUpdate } from "@/lib/tx";
 import { TxProgress } from "@/components/TxProgress";
 import { Stepper } from "@/components/Stepper";
@@ -72,6 +74,8 @@ const EXAMPLES = [
 
 export default function AppPage() {
   const [account, setAccount] = useState<string | null>(null);
+  const [demo, setDemo] = useState(false);
+  const [relay, setRelay] = useState<RelayInfo>({ enabled: false });
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +90,7 @@ export default function AppPage() {
     getAuthorizedAccount().then((address) => {
       if (address) setAccount(address);
     });
+    loadRelayInfo().then(setRelay);
   }, []);
 
   async function handleConnect() {
@@ -93,6 +98,7 @@ export default function AppPage() {
     try {
       const address = await connectMetaMask();
       setAccount(address);
+      setDemo(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -110,7 +116,8 @@ export default function AppPage() {
   }
 
   async function handleSubmit() {
-    if (!account || !text.trim()) return;
+    const useRelay = !account && demo && relay.enabled;
+    if ((!account && !useRelay) || !text.trim()) return;
     setBusy(true);
     setError(null);
     setResult(null);
@@ -119,9 +126,18 @@ export default function AppPage() {
     const patch = (update: TxUpdate) => setTx((prev) => ({ ...prev, ...update }));
 
     try {
-      const countBefore = await submitContent(account, text.trim(), patch);
+      const trimmed = text.trim();
+      let submitter = account ?? "";
+      let countBefore: number;
+      if (useRelay) {
+        const sent = await submitViaRelay(trimmed, patch);
+        countBefore = sent.countBefore;
+        submitter = sent.submitter;
+      } else {
+        countBefore = await submitContent(account as string, trimmed, patch);
+      }
       patch({ phase: "accepted" });
-      const latest = await findCaseSince(account, countBefore);
+      const latest = await findCaseSince(submitter, countBefore, useRelay ? trimmed : undefined);
       patch({ phase: "recorded" });
       setResult(latest);
       setText("");
@@ -142,7 +158,8 @@ export default function AppPage() {
   const ResultIcon = result ? RESULT_ICON[result.decision] : null;
   const resultCategoryMeta = result ? categoryMeta(result.primary_category) : null;
   const ResultCategoryIcon = resultCategoryMeta?.icon;
-  const step = !account ? 0 : busy || result ? 2 : 1;
+  const ready = Boolean(account) || (demo && relay.enabled);
+  const step = !ready ? 0 : busy || result ? 2 : 1;
 
   return (
     <>
@@ -194,13 +211,49 @@ export default function AppPage() {
                       </span>
                     )}
                   </>
+                ) : demo && relay.enabled ? (
+                  <>
+                    <span className="wallet-chip">
+                      <Play size={14} strokeWidth={1.75} aria-hidden="true" />
+                      Shared demo account
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={handleConnect}
+                      disabled={busy}
+                    >
+                      Use my wallet instead
+                    </button>
+                  </>
                 ) : (
-                  <button className="btn btn-primary" onClick={handleConnect}>
-                    <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
-                    Connect wallet
-                  </button>
+                  <>
+                    <button className="btn btn-primary" onClick={handleConnect}>
+                      <Wallet size={15} strokeWidth={1.75} aria-hidden="true" />
+                      Connect wallet
+                    </button>
+                    {relay.enabled && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setDemo(true)}
+                      >
+                        <Play size={15} strokeWidth={1.75} aria-hidden="true" />
+                        Try without a wallet
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
+
+              {demo && !account && relay.enabled && (
+                <p className="demo-note">
+                  Your text is signed by a shared demo account, so no wallet is needed. It is
+                  still a real transaction: the validators classify it and the case lands in the
+                  public log, where the submitter shows as the demo account. Posts are public and
+                  permanent, and a few per ten minutes are allowed.
+                </p>
+              )}
 
               <div className="example-row">
                 <span className="example-label">Try:</span>
@@ -210,7 +263,7 @@ export default function AppPage() {
                     type="button"
                     className="example-chip"
                     onClick={() => setText(ex.text)}
-                    disabled={!account || busy}
+                    disabled={!ready || busy}
                   >
                     {ex.label}
                   </button>
@@ -229,7 +282,7 @@ export default function AppPage() {
                   value={text}
                   maxLength={MAX_LEN}
                   onChange={(e) => setText(e.target.value)}
-                  disabled={!account || busy}
+                  disabled={!ready || busy}
                 />
                 <div className="char-count">
                   {text.length}/{MAX_LEN}
@@ -240,7 +293,7 @@ export default function AppPage() {
                 <button
                   className="btn btn-primary btn-arrow"
                   onClick={handleSubmit}
-                  disabled={!account || !text.trim() || busy}
+                  disabled={!ready || !text.trim() || busy}
                 >
                   {busy ? "Posting…" : "Post to feed"}
                   <span className="btn-arrow-icon" aria-hidden="true">
@@ -250,7 +303,11 @@ export default function AppPage() {
               </div>
 
               {tx.phase !== "idle" && (
-                <TxProgress tx={tx} caseId={result?.case_id ?? null} />
+                <TxProgress
+                  tx={tx}
+                  caseId={result?.case_id ?? null}
+                  via={account ? "wallet" : "relay"}
+                />
               )}
 
               {error && (

@@ -93,7 +93,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.14, ease: EASE }}
             >
-              Modeq replaces that with a public registry. Five independent GenLayer
+              Modeq replaces that with a public registry. Five GenLayer
               validators classify every piece of content and a majority must agree. Fixed
               thresholds - not a model&rsquo;s opinion - decide the outcome, and every
               case stays on-chain and checkable by anyone, forever.

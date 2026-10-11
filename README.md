@@ -178,7 +178,7 @@ npm run build      # production build
 npm test           # transaction tracker tests
 ```
 
-Connect MetaMask on `/app`. The app switches the wallet to the GenLayer network before
+Connect MetaMask on `/app`, or press "Try without a wallet" to post through a shared demo account. The app switches the wallet to the GenLayer network before
 every write, and does not rely on the client library for that check. Studio is a free test
 network and a brand-new empty account can submit. If a wallet shows "Fee is not set", enter
 any small custom fee such as 1 gwei; if it then shows "Insufficient balance", press **Get

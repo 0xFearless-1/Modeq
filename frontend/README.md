@@ -5,7 +5,7 @@ A Next.js 16 app (App Router, React 19) with three routes:
 | Route | What it does | Wallet |
 |---|---|---|
 | `/` | Landing page: live registry numbers, the case for consensus, how a verdict is made | no |
-| `/app` | Connect MetaMask, submit text, see the ALLOW / FLAG / BLOCK verdict once GenLayer consensus finalizes it | yes |
+| `/app` | Submit text and see the ALLOW / FLAG / BLOCK verdict once GenLayer consensus finalizes it, with your own wallet or through a shared demo account | optional |
 | `/audit` | Public audit log from `list_cases`: filters, per-case threshold trace, deep links | no |
 | `/demo` | 77-second narrated walkthrough hosted on the same origin, with chapters, captions and download | no |
 
@@ -21,6 +21,7 @@ npm run dev        # http://localhost:3000
 |---|---|
 | `NEXT_PUBLIC_CONTRACT_ADDRESS` | The `ModerationRegistry` address to read and write. The default is the studionet deployment in [../deploy/NOTES.md](../deploy/NOTES.md) |
 | `NEXT_PUBLIC_GENLAYER_RPC_URL` | GenLayer Studio endpoint |
+| `MODEQ_RELAYER_PRIVATE_KEY` | Optional, server only. Private key of a throwaway Studio account that signs demo posts. Put it in `.env.production.local` (gitignored). Without it the "Try without a wallet" button does not appear |
 
 Other scripts:
 
@@ -45,6 +46,28 @@ example 1 gwei. Wallets that also check the balance (Keplr, for one) then report
 `sim_fundAccount` for the connected account. The address must be EIP-55 checksummed or
 Studio credits nothing silently, so the app checksums it first. The app shows these hints
 while it waits for the signature.
+
+## Demo account (no wallet)
+
+A visitor without a wallet can press "Try without a wallet" on `/app`. The server signs the
+transaction with a throwaway Studio key and returns the transaction hash, and the browser then
+follows that transaction through consensus exactly as it does for a wallet. The verdict is
+real: the same contract, the same validators, a case in the public log. Differences worth
+knowing:
+
+- The case is recorded with the demo account as its submitter. The audit page labels it.
+- `POST /api/try` accepts at most 500 characters, refuses cross-site requests and is rate
+  limited: three posts per ten minutes per connection and thirty per hour overall.
+- The key controls nothing of value. Studio is a test network and the account only holds
+  free test GEN from `sim_fundAccount`.
+- Posts are public and permanent, like every other case.
+
+## Reading when Studio is slow
+
+`/audit` and the feed read the contract straight from Studio. When that read fails they fall
+back to `GET /api/cases`, a server-side snapshot of the case list that is refreshed every
+minute and on demand, and the page says so. The snapshot is only a fallback: live reads stay
+the default, so the log can still be checked without trusting this server.
 
 ## Transaction lifecycle
 
@@ -75,6 +98,8 @@ components/           SiteNav, Reveal, ScrollSteps, ProductWindow, RecentFeed, .
 lib/
   contract.ts         typed wrapper over the contract methods
   tx.ts               transaction tracker: statuses, votes, failure classification
+  relay.ts            client side of the demo account
+  server/             rate limiter, input checks, case snapshot cache, demo signer
   genlayer/           client and wallet helpers, including the network guard
   categories.tsx      category labels and icons
 public/               logo, favicon, llms.txt

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "test": "node --test lib/tx.test.ts lib/faucet.test.ts"
+    "test": "node --test lib/tx.test.ts lib/faucet.test.ts lib/server/rate-limit.test.ts lib/server/relay-input.test.ts lib/server/cases-cache.test.ts"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",

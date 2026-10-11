@@ -30,7 +30,8 @@ The live app uses GenLayer Studio. Real transactions there reached consensus wit
 - **No appeals and no human review.** A verdict is final. A wrong classification can only be answered by submitting the text again.
 - **Fixed rules.** The categories and the thresholds (BLOCK above 70%, FLAG above 40%) are the same for everyone. There are no per-community policies.
 - **Text only.** Images and other media are not classified.
-- **No gate.** Anyone can submit any text, with no fee or stake, so a flood of submissions is not rate limited.
+- **No gate on wallet posts.** Anyone can submit any text with a wallet, with no fee or stake, so a flood of submissions is not rate limited at the contract.
+- **A shared demo account.** To let a visitor try Modeq without a wallet, the app can sign a post with a throwaway Studio key held by the server. Such cases show the demo address as their submitter and go through the same validators, but they are throttled by the app (three per ten minutes per connection, thirty per hour overall), not by the contract.
 - **Public and permanent.** The submitted text is stored on-chain, including text that was blocked. The app hides blocked text by default, but it remains readable in contract state.
 - **A log, not an enforcer.** Modeq records verdicts. A forum or DAO that uses it still decides what to do with each verdict, and nothing is removed anywhere else automatically.
 

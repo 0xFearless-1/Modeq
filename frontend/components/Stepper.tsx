@@ -1,6 +1,6 @@
 "use client";
 
-const STEPS = ["Connect wallet", "Paste text", "Get verdict"];
+const STEPS = ["Pick an account", "Paste text", "Get verdict"];
 
 export function Stepper({ current }: { current: number }) {
   return (

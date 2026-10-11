@@ -79,19 +79,33 @@ function useElapsed(running: boolean): number {
   return seconds;
 }
 
-export function TxProgress({ tx, caseId }: { tx: TxState; caseId: number | null }) {
+export function TxProgress({
+  tx,
+  caseId,
+  via = "wallet",
+}: {
+  tx: TxState;
+  caseId: number | null;
+  via?: "wallet" | "relay";
+}) {
   const states = stepStates(tx);
   const elapsed = useElapsed(tx.phase === "consensus");
   const votes = tx.votes;
+
+  const relay = via === "relay";
 
   const walletDetail =
     tx.phase === "network"
       ? "Switching your wallet to GenLayer Studio…"
       : tx.phase === "signing"
-        ? "Waiting for your signature…"
+        ? relay
+          ? "Signing with the shared demo account…"
+          : "Waiting for your signature…"
         : states[0] === "failed"
           ? "Nothing was sent"
-          : "Signed";
+          : relay
+            ? "Signed by the shared demo account"
+            : "Signed";
 
   const consensusDetail =
     states[2] === "done"
@@ -141,9 +155,11 @@ export function TxProgress({ tx, caseId }: { tx: TxState; caseId: number | null 
         <li className={`tx-step ${states[0]}`}>
           <Marker state={states[0]} index={1} />
           <div className="tx-body">
-            <div className="tx-title">Confirm in your wallet</div>
+            <div className="tx-title">
+              {relay ? "Sent from the demo account" : "Confirm in your wallet"}
+            </div>
             <div className="tx-detail">{walletDetail}</div>
-            {tx.phase === "signing" && (
+            {tx.phase === "signing" && !relay && (
               <p className="tx-hint">
                 Approve disabled? If the wallet says &ldquo;Fee is not set&rdquo;, open
                 its fee settings and enter any small custom fee, for example 1 gwei. If it

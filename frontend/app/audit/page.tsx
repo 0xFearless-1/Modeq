@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { listCases, type Case, type Decision } from "@/lib/contract";
+import { listCasesWithMeta, type Case, type Decision } from "@/lib/contract";
+import { loadRelayInfo, sameAddress } from "@/lib/relay";
 import { getContractAddress } from "@/lib/genlayer/client";
 import { formatAddress } from "@/lib/genlayer/wallet";
 import { formatTimestamp } from "@/lib/format";
@@ -43,6 +44,8 @@ export default function AuditLogPage() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [snapshotAt, setSnapshotAt] = useState<number | null>(null);
+  const [demoAddress, setDemoAddress] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const [reveal, setReveal] = useState(false);
   const [openId, setOpenId] = useState<number | null>(null);
@@ -54,6 +57,10 @@ export default function AuditLogPage() {
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    loadRelayInfo().then((info) => setDemoAddress(info.enabled ? info.address : null));
   }, []);
 
   useEffect(() => {
@@ -72,9 +79,10 @@ export default function AuditLogPage() {
 
     async function refresh() {
       try {
-        const all = await listCases(0, 100);
+        const read = await listCasesWithMeta(0, 100);
         if (cancelled) return;
-        setCases(all.slice().reverse());
+        setCases(read.cases.slice().reverse());
+        setSnapshotAt(read.snapshotAt);
         setError(null);
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : String(err));
@@ -157,6 +165,13 @@ export default function AuditLogPage() {
           <p className="muted">Loading records from the chain…</p>
         </div>
       )}
+      {snapshotAt !== null && (
+        <p className="audit-snapshot" role="status">
+          Studio did not answer a live read, so this is a saved snapshot from{" "}
+          {new Date(snapshotAt).toISOString().slice(11, 16)} UTC. It retries every 15 seconds.
+        </p>
+      )}
+
       {error && (
         <div className="panel">
           <p className="error" role="alert" style={{ marginTop: 0 }}>
@@ -346,9 +361,8 @@ export default function AuditLogPage() {
                               <div className="audit-detail-label">Why this verdict</div>
                               <p className="audit-trace-line">{thresholdTrace(c)}</p>
                               <p className="audit-trace-line">
-                                Accepted by a majority of 5 independent GenLayer
-                                validators - this case could not have reached ACCEPTED
-                                otherwise.
+                                Accepted by a majority of the GenLayer validators - this
+                                case could not have reached ACCEPTED otherwise.
                               </p>
                             </div>
                             <div>
@@ -356,6 +370,8 @@ export default function AuditLogPage() {
                               <div className="audit-detail-meta">
                                 <div translate="no">
                                   submitter {formatAddress(c.submitter)}
+                                  {sameAddress(c.submitter, demoAddress) &&
+                                    " (shared demo account)"}
                                 </div>
                                 <div>case #{c.case_id}</div>
                                 <div>{formatTimestamp(c.timestamp)}</div>
